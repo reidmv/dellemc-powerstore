@@ -12,10 +12,6 @@ steps:
     parameters:
       query_string: select=name,volumes
 
-  - name: empty_volume_groups
-    eval: | 
-      $volume_groups.first.value
-         .filter |$k, $v| { $v['volumes'].empty }
-         .map |$k, $v| { $v['name'] }
+return: $volume_groups.first.value.filter |$k, $v| { $v['volumes'].empty }
+                                  .map |$k, $v| { $v['name'] }
 
-return: $empty_volume_groups

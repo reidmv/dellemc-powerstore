@@ -1,4 +1,4 @@
-# This plan deletes multiple volumes
+# This plan deletes multiple volumes after first removing them from a group if they are a group member.
 # @param volume_count Number of volumes to delete. The volume names are "vol_${i}" with $i ranging from 1 to $volume_count.
 plan powerstore::delete_multiple_volumes(
   TargetSpec $targets,

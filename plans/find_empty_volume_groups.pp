@@ -8,7 +8,5 @@ plan powerstore::find_empty_volume_groups(
     {query_string=>'select=name,volumes'}).first.value
 
   # Filter volume_groups to only those without volumes and take their names
-  $empty_volume_groups = $volume_groups.filter |$k, $v| { $v['volumes'].empty }.map |$k, $v| { $v['name'] }
-
-  return $empty_volume_groups
+  return $volume_groups.filter |$k, $v| { $v['volumes'].empty }.map |$k, $v| { $v['name'] }
 }
