@@ -310,7 +310,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           email_address: item['email_address'],
           id: item['id'],
           notify_critical: item['notify_critical'],
@@ -319,7 +318,6 @@ context.debug("Entered get")
           notify_minor: item['notify_minor'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

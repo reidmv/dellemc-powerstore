@@ -305,7 +305,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           destination: item['destination'],
           file_interface_id: item['file_interface_id'],
           gateway: item['gateway'],
@@ -315,7 +314,6 @@ context.debug("Entered get")
           prefix_length: item['prefix_length'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

@@ -386,7 +386,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           access_policy: item['access_policy'],
           access_policy_l10n: item['access_policy_l10n'],
           access_type: item['access_type'],
@@ -425,7 +424,6 @@ context.debug("Entered get")
           smb_notify_on_change_dir_depth: item['smb_notify_on_change_dir_depth'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

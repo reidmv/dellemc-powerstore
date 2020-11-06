@@ -396,7 +396,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_groups: item['add_groups'],
           add_hosts: item['add_hosts'],
           add_users: item['add_users'],
@@ -425,7 +424,6 @@ context.debug("Entered get")
           welcome_message: item['welcome_message'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

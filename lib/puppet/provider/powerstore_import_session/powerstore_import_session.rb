@@ -323,7 +323,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           automatic_cutover: item['automatic_cutover'],
           average_transfer_rate: item['average_transfer_rate'],
           current_transfer_rate: item['current_transfer_rate'],
@@ -347,7 +346,6 @@ context.debug("Entered get")
           volume_group_id: item['volume_group_id'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

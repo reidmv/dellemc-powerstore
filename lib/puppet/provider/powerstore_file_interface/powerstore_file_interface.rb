@@ -318,7 +318,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           gateway: item['gateway'],
           id: item['id'],
           ip_address: item['ip_address'],
@@ -331,7 +330,6 @@ context.debug("Entered get")
           vlan_id: item['vlan_id'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

@@ -304,7 +304,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_host_ids: item['add_host_ids'],
           description: item['description'],
           host_ids: item['host_ids'],
@@ -313,7 +312,6 @@ context.debug("Entered get")
           remove_host_ids: item['remove_host_ids'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

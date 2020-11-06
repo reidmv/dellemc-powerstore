@@ -326,7 +326,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           creation_timestamp: item['creation_timestamp'],
           delete_members: item['delete_members'],
           description: item['description'],
@@ -347,7 +346,6 @@ context.debug("Entered get")
           volume_ids: item['volume_ids'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

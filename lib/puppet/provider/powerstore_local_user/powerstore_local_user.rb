@@ -306,7 +306,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           current_password: item['current_password'],
           id: item['id'],
           is_built_in: item['is_built_in'],
@@ -317,7 +316,6 @@ context.debug("Entered get")
           role_id: item['role_id'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

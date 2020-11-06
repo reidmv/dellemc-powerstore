@@ -301,7 +301,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           address: item['address'],
           id: item['id'],
           instance_uuid: item['instance_uuid'],
@@ -309,7 +308,6 @@ context.debug("Entered get")
           username: item['username'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

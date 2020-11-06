@@ -313,7 +313,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_initiators: item['add_initiators'],
           description: item['description'],
           host_group_id: item['host_group_id'],
@@ -327,7 +326,6 @@ context.debug("Entered get")
           remove_initiators: item['remove_initiators'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

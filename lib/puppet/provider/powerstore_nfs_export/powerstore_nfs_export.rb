@@ -382,7 +382,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_no_access_hosts: item['add_no_access_hosts'],
           add_read_only_hosts: item['add_read_only_hosts'],
           add_read_only_root_hosts: item['add_read_only_root_hosts'],
@@ -413,7 +412,6 @@ context.debug("Entered get")
           remove_read_write_root_hosts: item['remove_read_write_root_hosts'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

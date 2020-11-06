@@ -293,7 +293,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           agent_address: item['agent_address'],
           agent_api_version: item['agent_api_version'],
           agent_port: item['agent_port'],
@@ -315,7 +314,6 @@ context.debug("Entered get")
           user_name: item['user_name'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

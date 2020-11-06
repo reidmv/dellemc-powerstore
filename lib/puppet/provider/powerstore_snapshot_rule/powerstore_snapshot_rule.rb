@@ -316,7 +316,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           days_of_week: item['days_of_week'],
           days_of_week_l10n: item['days_of_week_l10n'],
           delete_snaps: item['delete_snaps'],
@@ -329,7 +328,6 @@ context.debug("Entered get")
           time_of_day: item['time_of_day'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

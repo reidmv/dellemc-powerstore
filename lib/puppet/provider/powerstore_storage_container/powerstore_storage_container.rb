@@ -298,14 +298,12 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           force: item['force'],
           id: item['id'],
           name: item['name'],
           quota: item['quota'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

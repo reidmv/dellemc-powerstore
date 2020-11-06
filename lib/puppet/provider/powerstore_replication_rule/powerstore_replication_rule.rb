@@ -307,7 +307,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           alert_threshold: item['alert_threshold'],
           id: item['id'],
           is_replica: item['is_replica'],
@@ -317,7 +316,6 @@ context.debug("Entered get")
           rpo_l10n: item['rpo_l10n'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

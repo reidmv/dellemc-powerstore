@@ -292,14 +292,12 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           id: item['id'],
           is_config_file_uploaded: item['is_config_file_uploaded'],
           is_enabled: item['is_enabled'],
           nas_server_id: item['nas_server_id'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

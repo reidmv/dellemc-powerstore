@@ -320,7 +320,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_replication_rule_ids: item['add_replication_rule_ids'],
           add_snapshot_rule_ids: item['add_snapshot_rule_ids'],
           description: item['description'],
@@ -335,7 +334,6 @@ context.debug("Entered get")
           type_l10n: item['type_l10n'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

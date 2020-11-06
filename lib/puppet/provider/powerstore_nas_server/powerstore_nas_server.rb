@@ -352,7 +352,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           backup_i_pv4_interface_id: item['backup_IPv4_interface_id'],
           backup_i_pv6_interface_id: item['backup_IPv6_interface_id'],
           current_node_id: item['current_node_id'],
@@ -377,7 +376,6 @@ context.debug("Entered get")
           production_i_pv6_interface_id: item['production_IPv6_interface_id'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

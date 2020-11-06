@@ -309,7 +309,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           add_kdc_addresses: item['add_kdc_addresses'],
           id: item['id'],
           kdc_addresses: item['kdc_addresses'],
@@ -319,7 +318,6 @@ context.debug("Entered get")
           remove_kdc_addresses: item['remove_kdc_addresses'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash

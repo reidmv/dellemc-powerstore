@@ -341,7 +341,6 @@ context.debug("Entered get")
       items.collect do |item|
         hash = {
 
-
           data_connection_state: item['data_connection_state'],
           data_connection_state_l10n: item['data_connection_state_l10n'],
           data_connections: item['data_connections'],
@@ -367,7 +366,6 @@ context.debug("Entered get")
           user_name: item['user_name'],
           ensure: 'present',
         }
-
         Puppet.debug("Adding to collection: #{item}")
 
         hash
