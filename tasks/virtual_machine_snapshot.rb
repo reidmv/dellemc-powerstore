@@ -30,6 +30,7 @@ class PowerstoreVirtualMachineSnapshotTask < TaskHelper
     operation_verb = 'Post'
     operation_path = '/virtual_machine/%{id}/snapshot'
     parent_consumes = 'application/json'
+    parent_produces = 'application/json'
     query_params, body_params, path_params = format_params(arg_hash)
 
     header_params = {}
@@ -39,6 +40,9 @@ class PowerstoreVirtualMachineSnapshotTask < TaskHelper
     if result.is_a? Net::HTTPSuccess
       if result.body.nil?
         return nil
+      end
+      if result.to_hash["content-type"].include? "document/text"
+        return result.body
       end
       body = JSON.parse(result.body)
       if body.class == Array

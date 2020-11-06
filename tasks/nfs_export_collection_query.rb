@@ -30,6 +30,7 @@ class PowerstoreNfsExportCollectionQueryTask < TaskHelper
     operation_verb = 'Get'
     operation_path = '/nfs_export'
     parent_consumes = 'application/json'
+    parent_produces = 'application/json'
     query_params, body_params, path_params = format_params(arg_hash)
 
     header_params = {}
@@ -39,6 +40,9 @@ class PowerstoreNfsExportCollectionQueryTask < TaskHelper
     if result.is_a? Net::HTTPSuccess
       if result.body.nil?
         return nil
+      end
+      if result.to_hash["content-type"].include? "document/text"
+        return result.body
       end
       body = JSON.parse(result.body)
       if body.class == Array

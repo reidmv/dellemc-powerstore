@@ -74,10 +74,10 @@ module Puppet::Transport
       if !query_params['query_string'].nil?
         uri_string = uri_string + '?' + query_params['query_string']
       else
-        if operation_verb == 'Get'
+        if operation_verb == 'Get' and operation_path.include?("query")
           query_params['select'] = '*'
         end
-        uri_string = uri_string + '?' + to_query(query_params)
+        uri_string = uri_string + '?' + to_query(query_params) unless query_params.empty?
       end
       header_params['Content-Type'] = parent_consumes
       header_params['Range'] = '0-2000' # FIXME: this always requests the first 2000 pages of results, might be better to implement dynamic pagination based on 206 HTTP return code.
