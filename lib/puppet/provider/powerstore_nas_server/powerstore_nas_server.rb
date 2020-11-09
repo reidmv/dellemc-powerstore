@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,79 +83,75 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     nas_server = {}
-    nas_server["current_unix_directory_service"] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
-    nas_server["default_unix_user"] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
-    nas_server["default_windows_user"] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
-    nas_server["description"] = resource[:description] unless resource[:description].nil?
-    nas_server["is_auto_user_mapping_enabled"] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
-    nas_server["is_username_translation_enabled"] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
-    nas_server["name"] = resource[:name] unless resource[:name].nil?
+    nas_server['current_unix_directory_service'] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
+    nas_server['default_unix_user'] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
+    nas_server['default_windows_user'] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
+    nas_server['description'] = resource[:description] unless resource[:description].nil?
+    nas_server['is_auto_user_mapping_enabled'] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
+    nas_server['is_username_translation_enabled'] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
+    nas_server['name'] = resource[:name] unless resource[:name].nil?
     return nas_server
   end
 
   def build_update_hash(resource)
     nas_server = {}
-    nas_server["backup_IPv4_interface_id"] = resource[:backup_i_pv4_interface_id] unless resource[:backup_i_pv4_interface_id].nil?
-    nas_server["backup_IPv6_interface_id"] = resource[:backup_i_pv6_interface_id] unless resource[:backup_i_pv6_interface_id].nil?
-    nas_server["current_node_id"] = resource[:current_node_id] unless resource[:current_node_id].nil?
-    nas_server["current_unix_directory_service"] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
-    nas_server["default_unix_user"] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
-    nas_server["default_windows_user"] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
-    nas_server["description"] = resource[:description] unless resource[:description].nil?
-    nas_server["is_auto_user_mapping_enabled"] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
-    nas_server["is_username_translation_enabled"] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
-    nas_server["name"] = resource[:name] unless resource[:name].nil?
-    nas_server["preferred_node_id"] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
-    nas_server["production_IPv4_interface_id"] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
-    nas_server["production_IPv6_interface_id"] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
+    nas_server['backup_IPv4_interface_id'] = resource[:backup_i_pv4_interface_id] unless resource[:backup_i_pv4_interface_id].nil?
+    nas_server['backup_IPv6_interface_id'] = resource[:backup_i_pv6_interface_id] unless resource[:backup_i_pv6_interface_id].nil?
+    nas_server['current_node_id'] = resource[:current_node_id] unless resource[:current_node_id].nil?
+    nas_server['current_unix_directory_service'] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
+    nas_server['default_unix_user'] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
+    nas_server['default_windows_user'] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
+    nas_server['description'] = resource[:description] unless resource[:description].nil?
+    nas_server['is_auto_user_mapping_enabled'] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
+    nas_server['is_username_translation_enabled'] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
+    nas_server['name'] = resource[:name] unless resource[:name].nil?
+    nas_server['preferred_node_id'] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
+    nas_server['production_IPv4_interface_id'] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
+    nas_server['production_IPv6_interface_id'] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
     return nas_server
   end
 
   def build_delete_hash(resource)
     nas_server = {}
-    nas_server["domain_password"] = resource[:domain_password] unless resource[:domain_password].nil?
-    nas_server["domain_user_name"] = resource[:domain_user_name] unless resource[:domain_user_name].nil?
-    nas_server["is_skip_domain_unjoin"] = resource[:is_skip_domain_unjoin] unless resource[:is_skip_domain_unjoin].nil?
+    nas_server['domain_password'] = resource[:domain_password] unless resource[:domain_password].nil?
+    nas_server['domain_user_name'] = resource[:domain_user_name] unless resource[:domain_user_name].nil?
+    nas_server['is_skip_domain_unjoin'] = resource[:is_skip_domain_unjoin] unless resource[:is_skip_domain_unjoin].nil?
     return nas_server
   end
 
   def build_hash(resource)
     nas_server = {}
-    nas_server["backup_IPv4_interface_id"] = resource[:backup_i_pv4_interface_id] unless resource[:backup_i_pv4_interface_id].nil?
-    nas_server["backup_IPv6_interface_id"] = resource[:backup_i_pv6_interface_id] unless resource[:backup_i_pv6_interface_id].nil?
-    nas_server["current_node_id"] = resource[:current_node_id] unless resource[:current_node_id].nil?
-    nas_server["current_preferred_IPv4_interface_id"] = resource[:current_preferred_i_pv4_interface_id] unless resource[:current_preferred_i_pv4_interface_id].nil?
-    nas_server["current_preferred_IPv6_interface_id"] = resource[:current_preferred_i_pv6_interface_id] unless resource[:current_preferred_i_pv6_interface_id].nil?
-    nas_server["current_unix_directory_service"] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
-    nas_server["current_unix_directory_service_l10n"] = resource[:current_unix_directory_service_l10n] unless resource[:current_unix_directory_service_l10n].nil?
-    nas_server["default_unix_user"] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
-    nas_server["default_windows_user"] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
-    nas_server["description"] = resource[:description] unless resource[:description].nil?
-    nas_server["domain_password"] = resource[:domain_password] unless resource[:domain_password].nil?
-    nas_server["domain_user_name"] = resource[:domain_user_name] unless resource[:domain_user_name].nil?
-    nas_server["id"] = resource[:id] unless resource[:id].nil?
-    nas_server["is_auto_user_mapping_enabled"] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
-    nas_server["is_skip_domain_unjoin"] = resource[:is_skip_domain_unjoin] unless resource[:is_skip_domain_unjoin].nil?
-    nas_server["is_username_translation_enabled"] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
-    nas_server["name"] = resource[:name] unless resource[:name].nil?
-    nas_server["operational_status"] = resource[:operational_status] unless resource[:operational_status].nil?
-    nas_server["operational_status_l10n"] = resource[:operational_status_l10n] unless resource[:operational_status_l10n].nil?
-    nas_server["preferred_node_id"] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
-    nas_server["production_IPv4_interface_id"] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
-    nas_server["production_IPv6_interface_id"] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
+    nas_server['backup_IPv4_interface_id'] = resource[:backup_i_pv4_interface_id] unless resource[:backup_i_pv4_interface_id].nil?
+    nas_server['backup_IPv6_interface_id'] = resource[:backup_i_pv6_interface_id] unless resource[:backup_i_pv6_interface_id].nil?
+    nas_server['current_node_id'] = resource[:current_node_id] unless resource[:current_node_id].nil?
+    nas_server['current_preferred_IPv4_interface_id'] = resource[:current_preferred_i_pv4_interface_id] unless resource[:current_preferred_i_pv4_interface_id].nil?
+    nas_server['current_preferred_IPv6_interface_id'] = resource[:current_preferred_i_pv6_interface_id] unless resource[:current_preferred_i_pv6_interface_id].nil?
+    nas_server['current_unix_directory_service'] = resource[:current_unix_directory_service] unless resource[:current_unix_directory_service].nil?
+    nas_server['current_unix_directory_service_l10n'] = resource[:current_unix_directory_service_l10n] unless resource[:current_unix_directory_service_l10n].nil?
+    nas_server['default_unix_user'] = resource[:default_unix_user] unless resource[:default_unix_user].nil?
+    nas_server['default_windows_user'] = resource[:default_windows_user] unless resource[:default_windows_user].nil?
+    nas_server['description'] = resource[:description] unless resource[:description].nil?
+    nas_server['domain_password'] = resource[:domain_password] unless resource[:domain_password].nil?
+    nas_server['domain_user_name'] = resource[:domain_user_name] unless resource[:domain_user_name].nil?
+    nas_server['id'] = resource[:id] unless resource[:id].nil?
+    nas_server['is_auto_user_mapping_enabled'] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
+    nas_server['is_skip_domain_unjoin'] = resource[:is_skip_domain_unjoin] unless resource[:is_skip_domain_unjoin].nil?
+    nas_server['is_username_translation_enabled'] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
+    nas_server['name'] = resource[:name] unless resource[:name].nil?
+    nas_server['operational_status'] = resource[:operational_status] unless resource[:operational_status].nil?
+    nas_server['operational_status_l10n'] = resource[:operational_status_l10n] unless resource[:operational_status_l10n].nil?
+    nas_server['preferred_node_id'] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
+    nas_server['production_IPv4_interface_id'] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
+    nas_server['production_IPv6_interface_id'] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
     return nas_server
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -417,8 +412,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -437,16 +432,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 

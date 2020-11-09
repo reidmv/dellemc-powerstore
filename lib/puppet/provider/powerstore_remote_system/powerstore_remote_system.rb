@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,28 +83,28 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     remote_system = {}
-    remote_system["data_network_latency"] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
-    remote_system["description"] = resource[:description] unless resource[:description].nil?
-    remote_system["discovery_chap_mode"] = resource[:discovery_chap_mode] unless resource[:discovery_chap_mode].nil?
-    remote_system["import_chap_info"] = resource[:import_chap_info] unless resource[:import_chap_info].nil?
-    remote_system["iscsi_addresses"] = resource[:iscsi_addresses] unless resource[:iscsi_addresses].nil?
-    remote_system["management_address"] = resource[:management_address] unless resource[:management_address].nil?
-    remote_system["name"] = resource[:name] unless resource[:name].nil?
-    remote_system["remote_password"] = resource[:remote_password] unless resource[:remote_password].nil?
-    remote_system["remote_username"] = resource[:remote_username] unless resource[:remote_username].nil?
-    remote_system["session_chap_mode"] = resource[:session_chap_mode] unless resource[:session_chap_mode].nil?
-    remote_system["type"] = resource[:type] unless resource[:type].nil?
+    remote_system['data_network_latency'] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
+    remote_system['description'] = resource[:description] unless resource[:description].nil?
+    remote_system['discovery_chap_mode'] = resource[:discovery_chap_mode] unless resource[:discovery_chap_mode].nil?
+    remote_system['import_chap_info'] = resource[:import_chap_info] unless resource[:import_chap_info].nil?
+    remote_system['iscsi_addresses'] = resource[:iscsi_addresses] unless resource[:iscsi_addresses].nil?
+    remote_system['management_address'] = resource[:management_address] unless resource[:management_address].nil?
+    remote_system['name'] = resource[:name] unless resource[:name].nil?
+    remote_system['remote_password'] = resource[:remote_password] unless resource[:remote_password].nil?
+    remote_system['remote_username'] = resource[:remote_username] unless resource[:remote_username].nil?
+    remote_system['session_chap_mode'] = resource[:session_chap_mode] unless resource[:session_chap_mode].nil?
+    remote_system['type'] = resource[:type] unless resource[:type].nil?
     return remote_system
   end
 
   def build_update_hash(resource)
     remote_system = {}
-    remote_system["data_network_latency"] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
-    remote_system["description"] = resource[:description] unless resource[:description].nil?
-    remote_system["management_address"] = resource[:management_address] unless resource[:management_address].nil?
-    remote_system["name"] = resource[:name] unless resource[:name].nil?
-    remote_system["remote_password"] = resource[:remote_password] unless resource[:remote_password].nil?
-    remote_system["remote_username"] = resource[:remote_username] unless resource[:remote_username].nil?
+    remote_system['data_network_latency'] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
+    remote_system['description'] = resource[:description] unless resource[:description].nil?
+    remote_system['management_address'] = resource[:management_address] unless resource[:management_address].nil?
+    remote_system['name'] = resource[:name] unless resource[:name].nil?
+    remote_system['remote_password'] = resource[:remote_password] unless resource[:remote_password].nil?
+    remote_system['remote_username'] = resource[:remote_username] unless resource[:remote_username].nil?
     return remote_system
   end
 
@@ -116,42 +115,38 @@ context.debug("Entered get")
 
   def build_hash(resource)
     remote_system = {}
-    remote_system["data_connection_state"] = resource[:data_connection_state] unless resource[:data_connection_state].nil?
-    remote_system["data_connection_state_l10n"] = resource[:data_connection_state_l10n] unless resource[:data_connection_state_l10n].nil?
-    remote_system["data_connections"] = resource[:data_connections] unless resource[:data_connections].nil?
-    remote_system["data_network_latency"] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
-    remote_system["data_network_latency_l10n"] = resource[:data_network_latency_l10n] unless resource[:data_network_latency_l10n].nil?
-    remote_system["description"] = resource[:description] unless resource[:description].nil?
-    remote_system["discovery_chap_mode"] = resource[:discovery_chap_mode] unless resource[:discovery_chap_mode].nil?
-    remote_system["discovery_chap_mode_l10n"] = resource[:discovery_chap_mode_l10n] unless resource[:discovery_chap_mode_l10n].nil?
-    remote_system["id"] = resource[:id] unless resource[:id].nil?
-    remote_system["import_chap_info"] = resource[:import_chap_info] unless resource[:import_chap_info].nil?
-    remote_system["iscsi_addresses"] = resource[:iscsi_addresses] unless resource[:iscsi_addresses].nil?
-    remote_system["management_address"] = resource[:management_address] unless resource[:management_address].nil?
-    remote_system["name"] = resource[:name] unless resource[:name].nil?
-    remote_system["remote_password"] = resource[:remote_password] unless resource[:remote_password].nil?
-    remote_system["remote_username"] = resource[:remote_username] unless resource[:remote_username].nil?
-    remote_system["serial_number"] = resource[:serial_number] unless resource[:serial_number].nil?
-    remote_system["session_chap_mode"] = resource[:session_chap_mode] unless resource[:session_chap_mode].nil?
-    remote_system["session_chap_mode_l10n"] = resource[:session_chap_mode_l10n] unless resource[:session_chap_mode_l10n].nil?
-    remote_system["state"] = resource[:state] unless resource[:state].nil?
-    remote_system["state_l10n"] = resource[:state_l10n] unless resource[:state_l10n].nil?
-    remote_system["type"] = resource[:type] unless resource[:type].nil?
-    remote_system["type_l10n"] = resource[:type_l10n] unless resource[:type_l10n].nil?
-    remote_system["user_name"] = resource[:user_name] unless resource[:user_name].nil?
+    remote_system['data_connection_state'] = resource[:data_connection_state] unless resource[:data_connection_state].nil?
+    remote_system['data_connection_state_l10n'] = resource[:data_connection_state_l10n] unless resource[:data_connection_state_l10n].nil?
+    remote_system['data_connections'] = resource[:data_connections] unless resource[:data_connections].nil?
+    remote_system['data_network_latency'] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
+    remote_system['data_network_latency_l10n'] = resource[:data_network_latency_l10n] unless resource[:data_network_latency_l10n].nil?
+    remote_system['description'] = resource[:description] unless resource[:description].nil?
+    remote_system['discovery_chap_mode'] = resource[:discovery_chap_mode] unless resource[:discovery_chap_mode].nil?
+    remote_system['discovery_chap_mode_l10n'] = resource[:discovery_chap_mode_l10n] unless resource[:discovery_chap_mode_l10n].nil?
+    remote_system['id'] = resource[:id] unless resource[:id].nil?
+    remote_system['import_chap_info'] = resource[:import_chap_info] unless resource[:import_chap_info].nil?
+    remote_system['iscsi_addresses'] = resource[:iscsi_addresses] unless resource[:iscsi_addresses].nil?
+    remote_system['management_address'] = resource[:management_address] unless resource[:management_address].nil?
+    remote_system['name'] = resource[:name] unless resource[:name].nil?
+    remote_system['remote_password'] = resource[:remote_password] unless resource[:remote_password].nil?
+    remote_system['remote_username'] = resource[:remote_username] unless resource[:remote_username].nil?
+    remote_system['serial_number'] = resource[:serial_number] unless resource[:serial_number].nil?
+    remote_system['session_chap_mode'] = resource[:session_chap_mode] unless resource[:session_chap_mode].nil?
+    remote_system['session_chap_mode_l10n'] = resource[:session_chap_mode_l10n] unless resource[:session_chap_mode_l10n].nil?
+    remote_system['state'] = resource[:state] unless resource[:state].nil?
+    remote_system['state_l10n'] = resource[:state_l10n] unless resource[:state_l10n].nil?
+    remote_system['type'] = resource[:type] unless resource[:type].nil?
+    remote_system['type_l10n'] = resource[:type_l10n] unless resource[:type_l10n].nil?
+    remote_system['user_name'] = resource[:user_name] unless resource[:user_name].nil?
     return remote_system
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -407,8 +402,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -427,16 +422,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 

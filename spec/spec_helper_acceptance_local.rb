@@ -15,19 +15,11 @@ def run_device(options = { allow_changes: true, allow_warnings: false, allow_err
   command = "bundle exec puppet device --apply #{@file.path} #{COMMON_ARGS} --verbose --trace --debug"
   # puts "run_device: ", command
 
-  output, _status = Open3.capture2e("bundle exec puppet device --apply #{@file.path} #{COMMON_ARGS} --verbose --trace --debug")
+  output, _status = Open3.capture2e(command)
 
-  unless options[:allow_changes]
-    expect(output).not_to match(%r{^(\e.*?m)?Notice: /Stage\[main\]})
-  end
-
-  unless options[:allow_errors]
-    expect(output).not_to match %r{^(\e.*?m)?Error:}
-  end
-
-  unless options[:allow_warnings]
-    expect(output).not_to match %r{^(\e.*?m)?Warning:}
-  end
+  expect(output).not_to match(%r{^(\e.*?m)?Notice: /Stage\[main\]}) unless options[:allow_changes]
+  expect(output).not_to match %r{/^(\e.*?m)?Error:/} unless options[:allow_errors]
+  expect(output).not_to match %r{/^(\e.*?m)?Warning:/} unless options[:allow_warnings]
 
   output
 end
@@ -53,8 +45,7 @@ end
 def manifest_from_values(type_name, value_hash)
   attrs = type_attrs(type_name)
   resource = Puppet::ResourceApi::ResourceShim.new(value_hash, type_name, namevars(attrs), attrs)
-  manifest = resource.to_manifest
-  manifest
+  resource.to_manifest
 end
 
 def sample_manifest(type_name)
@@ -71,14 +62,14 @@ def sample_attr_value(name, attr)
     raise "Cannot determine type of attr: #{attr}"
   end
   type = parse_type(name, type_str)
-  if name =~ /timestamp/
-    DateTime.now().iso8601
+  if name =~ %r{/timestamp/}
+    DateTime.now.iso8601
   else
     sample_value(type)
   end
 end
 
-def sample_resource(type_name, options = {ensure: :present, namevars_value: nil})
+def sample_resource(type_name, options = { ensure: :present, namevars_value: nil })
   attrs = type_attrs(type_name)
   result = attrs.map { |k, v| [k, sample_attr_value(k, v)] }.to_h
   result[:ensure] = options[:ensure]
@@ -103,33 +94,34 @@ end
 def sample_value(type)
   # require 'pry';binding.pry
   case type.name
-  when "Optional"
+  when 'Optional'
     sample_value(type.type)
-  when "String"
-    min_length = type.size_type.from if !type.size_type.nil? and !type.size_type.from.nil? 
-    max_length = type.size_type.to if !type.size_type.nil? and !type.size_type.to.nil? 
-    length = (!min_length or min_length < 8) ? 8 : min_length
-    length = max_length if max_length and length > max_length
-    return length.times.map { [*'0'..'9', *'a'..'z', *'A'..'Z'].sample }.join
-  when "Integer"
-    if !type.from.nil? and !type.to.nil?
+  when 'String'
+    min_length = type.size_type.from if !type.size_type.nil? && !type.size_type.from.nil?
+    max_length = type.size_type.to if !type.size_type.nil? && !type.size_type.to.nil?
+    length = !min_length or min_length < 8 ? 8 : min_length
+    length = max_length if max_length && length > max_length
+    length.times.map { [*'0'..'9', *'a'..'z', *'A'..'Z'].sample }.join
+  when 'Integer'
+    if !type.from.nil? && !type.to.nil?
       (type.from + type.to) / 2
     else
       1984
     end
-  when "Boolean"
+  when 'Boolean'
     true
-  when "Array"
-    [ sample_value(type.element_type), sample_value(type.element_type) ]
-  when "Hash"
+  when 'Array'
+    [sample_value(type.element_type), sample_value(type.element_type)]
+  when 'Hash'
     { sample_value(type.key_type) => sample_value(type.value_type) }
-  when "Struct"
-    type.elements.reduce({}) { |retval, el| 
-      retval[el.name] = sample_value(el.value_type); retval
+  when 'Struct'
+    type.elements.reduce({}) { |retval, el|
+      retval[el.name] = sample_value(el.value_type)
+      retval
     }
-  when "Enum"
+  when 'Enum'
     type.values[0]
-  when "Any"
+  when 'Any'
     'AnyValue'
   else
     'UnknownType'
@@ -163,7 +155,7 @@ RSpec.configure do |c|
 
   if mode == 'device'
     if device['user'].empty? || device['password'].empty? || device['host'].empty?
-      puts "To test a real device, export environment variables DEVICE_USER, DEVICE_PASSWORD, DEVICE_IP!"
+      puts 'To test a real device, export environment variables DEVICE_USER, DEVICE_PASSWORD, DEVICE_IP!'
       exit 1
     else
       sut = device
@@ -177,25 +169,26 @@ RSpec.configure do |c|
   end
 
   File.open('spec/fixtures/acceptance-device.conf', 'w') do |file|
-    file.puts <<DEVICE
-[sut]
-type powerstore
-url file://#{Dir.getwd}/spec/fixtures/sut.json
-DEVICE
+    file.puts <<~DEVICE
+      [sut]
+      type powerstore
+      url file://#{Dir.getwd}/spec/fixtures/sut.json
+    DEVICE
   end
-  inventory = { 'version' => 2, 'targets' => [
-    'uri' => sut['host'],
-    'name' => 'sut',
-    'config' => {
-      'transport' => 'remote',
-    }
-  ]}
+  inventory = {
+    'version' => 2,
+    'targets' => [
+      'uri' => sut['host'],
+      'name' => 'sut',
+      'config' => {
+        'transport' => 'remote'
+      }
+    ]
+  }
   inventory['targets'][0]['config']['remote'] = sut
   inventory['targets'][0]['config']['remote']['remote-transport'] = 'powerstore'
 
   File.open('spec/fixtures/inventory.yaml', 'w') do |file|
     file.write inventory.to_yaml
   end
-
-
 end

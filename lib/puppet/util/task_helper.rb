@@ -110,8 +110,6 @@ class TaskHelper
     end
   end
 
-  private
-
   # Syncs across anything from the module lib
   def self.add_plugin_paths(install_dir)
     Dir.glob(File.join([install_dir, '*'])).each do |mod|

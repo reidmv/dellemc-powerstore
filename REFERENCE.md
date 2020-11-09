@@ -6,36 +6,36 @@
 
 ### Resource types
 
-* [`powerstore_email_notify_destination`](#powerstore_email_notify_destination)
-* [`powerstore_file_dns`](#powerstore_file_dns)
-* [`powerstore_file_ftp`](#powerstore_file_ftp)
-* [`powerstore_file_interface`](#powerstore_file_interface)
-* [`powerstore_file_interface_route`](#powerstore_file_interface_route)
-* [`powerstore_file_kerberos`](#powerstore_file_kerberos)
-* [`powerstore_file_ldap`](#powerstore_file_ldap)
-* [`powerstore_file_ndmp`](#powerstore_file_ndmp)
-* [`powerstore_file_nis`](#powerstore_file_nis)
-* [`powerstore_file_system`](#powerstore_file_system)
-* [`powerstore_file_tree_quota`](#powerstore_file_tree_quota)
-* [`powerstore_file_virus_checker`](#powerstore_file_virus_checker)
-* [`powerstore_host`](#powerstore_host)
-* [`powerstore_host_group`](#powerstore_host_group)
-* [`powerstore_import_host_system`](#powerstore_import_host_system)
-* [`powerstore_import_session`](#powerstore_import_session)
-* [`powerstore_local_user`](#powerstore_local_user)
-* [`powerstore_migration_session`](#powerstore_migration_session)
-* [`powerstore_nas_server`](#powerstore_nas_server)
-* [`powerstore_nfs_export`](#powerstore_nfs_export)
-* [`powerstore_physical_switch`](#powerstore_physical_switch)
-* [`powerstore_policy`](#powerstore_policy)
-* [`powerstore_remote_system`](#powerstore_remote_system)
-* [`powerstore_replication_rule`](#powerstore_replication_rule)
-* [`powerstore_smb_share`](#powerstore_smb_share)
-* [`powerstore_snapshot_rule`](#powerstore_snapshot_rule)
-* [`powerstore_storage_container`](#powerstore_storage_container)
-* [`powerstore_vcenter`](#powerstore_vcenter)
-* [`powerstore_volume`](#powerstore_volume)
-* [`powerstore_volume_group`](#powerstore_volume_group)
+* [`powerstore_email_notify_destination`](#powerstore_email_notify_destination): rubocop:disable Style/StringLiterals
+* [`powerstore_file_dns`](#powerstore_file_dns): rubocop:disable Style/StringLiterals
+* [`powerstore_file_ftp`](#powerstore_file_ftp): rubocop:disable Style/StringLiterals
+* [`powerstore_file_interface`](#powerstore_file_interface): rubocop:disable Style/StringLiterals
+* [`powerstore_file_interface_route`](#powerstore_file_interface_route): rubocop:disable Style/StringLiterals
+* [`powerstore_file_kerberos`](#powerstore_file_kerberos): rubocop:disable Style/StringLiterals
+* [`powerstore_file_ldap`](#powerstore_file_ldap): rubocop:disable Style/StringLiterals
+* [`powerstore_file_ndmp`](#powerstore_file_ndmp): rubocop:disable Style/StringLiterals
+* [`powerstore_file_nis`](#powerstore_file_nis): rubocop:disable Style/StringLiterals
+* [`powerstore_file_system`](#powerstore_file_system): rubocop:disable Style/StringLiterals
+* [`powerstore_file_tree_quota`](#powerstore_file_tree_quota): rubocop:disable Style/StringLiterals
+* [`powerstore_file_virus_checker`](#powerstore_file_virus_checker): rubocop:disable Style/StringLiterals
+* [`powerstore_host`](#powerstore_host): rubocop:disable Style/StringLiterals
+* [`powerstore_host_group`](#powerstore_host_group): rubocop:disable Style/StringLiterals
+* [`powerstore_import_host_system`](#powerstore_import_host_system): rubocop:disable Style/StringLiterals
+* [`powerstore_import_session`](#powerstore_import_session): rubocop:disable Style/StringLiterals
+* [`powerstore_local_user`](#powerstore_local_user): rubocop:disable Style/StringLiterals
+* [`powerstore_migration_session`](#powerstore_migration_session): rubocop:disable Style/StringLiterals
+* [`powerstore_nas_server`](#powerstore_nas_server): rubocop:disable Style/StringLiterals
+* [`powerstore_nfs_export`](#powerstore_nfs_export): rubocop:disable Style/StringLiterals
+* [`powerstore_physical_switch`](#powerstore_physical_switch): rubocop:disable Style/StringLiterals
+* [`powerstore_policy`](#powerstore_policy): rubocop:disable Style/StringLiterals
+* [`powerstore_remote_system`](#powerstore_remote_system): rubocop:disable Style/StringLiterals
+* [`powerstore_replication_rule`](#powerstore_replication_rule): rubocop:disable Style/StringLiterals
+* [`powerstore_smb_share`](#powerstore_smb_share): rubocop:disable Style/StringLiterals
+* [`powerstore_snapshot_rule`](#powerstore_snapshot_rule): rubocop:disable Style/StringLiterals
+* [`powerstore_storage_container`](#powerstore_storage_container): rubocop:disable Style/StringLiterals
+* [`powerstore_vcenter`](#powerstore_vcenter): rubocop:disable Style/StringLiterals
+* [`powerstore_volume`](#powerstore_volume): rubocop:disable Style/StringLiterals
+* [`powerstore_volume_group`](#powerstore_volume_group): rubocop:disable Style/StringLiterals
 
 ### Functions
 
@@ -454,7 +454,7 @@ host
 
 ### `powerstore_email_notify_destination`
 
-The powerstore_email_notify_destination type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -512,7 +512,7 @@ Unique identifier of the email notification destination.
 
 ### `powerstore_file_dns`
 
-The powerstore_file_dns type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -582,7 +582,7 @@ Unique identifier of the DNS object.
 
 ### `powerstore_file_ftp`
 
-The powerstore_file_ftp type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -760,7 +760,7 @@ Unique identifier of the FTP/SFTP Server object.
 
 ### `powerstore_file_interface`
 
-The powerstore_file_interface type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -842,7 +842,7 @@ Unique identifier of the file interface.
 
 ### `powerstore_file_interface_route`
 
-The powerstore_file_interface_route type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -906,7 +906,7 @@ Unique identifier of the file interface route object.
 
 ### `powerstore_file_kerberos`
 
-The powerstore_file_kerberos type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -970,7 +970,7 @@ Unique identifier of the Kerberos service object.
 
 ### `powerstore_file_ldap`
 
-The powerstore_file_ldap type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1130,7 +1130,7 @@ LDAP settings object Id.
 
 ### `powerstore_file_ndmp`
 
-The powerstore_file_ndmp type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1176,7 +1176,7 @@ Unique identifier of the NDMP service object.
 
 ### `powerstore_file_nis`
 
-The powerstore_file_nis type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1234,7 +1234,7 @@ Unique identifier of the NIS object.
 
 ### `powerstore_file_system`
 
-The powerstore_file_system type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1472,7 +1472,7 @@ Name of the file system. (255 UTF-8 characters).
 
 ### `powerstore_file_tree_quota`
 
-The powerstore_file_tree_quota type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1560,7 +1560,7 @@ Unique identifier of the tree quota.
 
 ### `powerstore_file_virus_checker`
 
-The powerstore_file_virus_checker type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1606,7 +1606,7 @@ Unique identifier of the virus checker instance.
 
 ### `powerstore_host`
 
-The powerstore_host type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1695,7 +1695,7 @@ characters.
 
 ### `powerstore_host_group`
 
-The powerstore_host_group type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1754,7 +1754,7 @@ characters.
 
 ### `powerstore_import_host_system`
 
-The powerstore_import_host_system type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -1890,7 +1890,7 @@ Unique identifier of the import host system
 
 ### `powerstore_import_session`
 
-The powerstore_import_session type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2039,7 +2039,7 @@ characters. It cannot contain special HTTP characters, unprintable characters, o
 
 ### `powerstore_local_user`
 
-The powerstore_local_user type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2110,7 +2110,7 @@ alphanumeric characters. Dot(.) is the only special character allowed.
 
 ### `powerstore_migration_session`
 
-The powerstore_migration_session type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2169,7 +2169,7 @@ It cannot contain unprintable characters, special HTTP characters, or whitespace
 
 ### `powerstore_nas_server`
 
-The powerstore_nas_server type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2329,7 +2329,7 @@ Name of the NAS server.
 
 ### `powerstore_nfs_export`
 
-The powerstore_nfs_export type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2519,7 +2519,7 @@ NFS Export name.
 
 ### `powerstore_physical_switch`
 
-The powerstore_physical_switch type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2571,7 +2571,7 @@ Name of a physical switch.
 
 ### `powerstore_policy`
 
-The powerstore_policy type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2665,7 +2665,7 @@ Policy name.
 
 ### `powerstore_remote_system`
 
-The powerstore_remote_system type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2827,7 +2827,7 @@ printable Unicode characters.
 
 ### `powerstore_replication_rule`
 
-The powerstore_replication_rule type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2891,7 +2891,7 @@ Name of the replication rule.
 
 ### `powerstore_smb_share`
 
-The powerstore_smb_share type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -2985,7 +2985,7 @@ SMB share name.
 
 ### `powerstore_snapshot_rule`
 
-The powerstore_snapshot_rule type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -3067,7 +3067,7 @@ Snapshot rule name.
 
 ### `powerstore_storage_container`
 
-The powerstore_storage_container type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -3115,7 +3115,7 @@ and 64 UTF-8 characters (inclusive), and not more than 127 bytes.
 
 ### `powerstore_vcenter`
 
-The powerstore_vcenter type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -3167,7 +3167,7 @@ Unique identifier of the vCenter to delete.
 
 ### `powerstore_volume`
 
-The powerstore_volume type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 
@@ -3351,7 +3351,7 @@ Unique name for the volume to be created. This value must contain 128 or fewer p
 
 ### `powerstore_volume_group`
 
-The powerstore_volume_group type.
+rubocop:disable Style/StringLiterals
 
 #### Properties
 

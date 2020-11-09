@@ -5,6 +5,7 @@ require 'spec_helper'
 ensure_module_defined('Puppet::Provider::PowerstoreFileDns')
 require 'puppet/provider/powerstore_file_dns/powerstore_file_dns'
 
+# rubocop:disable RSpec/FilePath
 RSpec.describe Puppet::Provider::PowerstoreFileDns::PowerstoreFileDns do
   subject(:provider) { described_class.new }
 
@@ -35,29 +36,28 @@ RSpec.describe Puppet::Provider::PowerstoreFileDns::PowerstoreFileDns do
 
   describe 'create(context, name, should)' do
     it 'creates the resource' do
-      allow(context).to receive(:creating).with("bar").and_yield
-      expect(transport).to receive(:call_op).with(any_args, "Post", anything)
+      allow(context).to receive(:creating).with('bar').and_yield
+      expect(transport).to receive(:call_op).with(any_args, 'Post', anything)
 
       provider.create(context, 'bar', name: 'bar', ensure: 'present')
     end
   end
 
-  
   describe 'update(context, name, should)' do
     it 'updates the resource' do
-      allow(context).to receive(:updating).with("foo").and_yield
-      expect(transport).to receive(:call_op).with(any_args, "Patch", anything)
+      allow(context).to receive(:updating).with('foo').and_yield
+      expect(transport).to receive(:call_op).with(any_args, 'Patch', anything)
 
       provider.update(context, 'foo', name: 'foo', ensure: 'present')
     end
   end
-  
+
 
   describe 'delete(context, should)' do
     it 'deletes the resource' do
-      expect(transport).to receive(:call_op).with(any_args, "Delete", anything)
+      expect(transport).to receive(:call_op).with(any_args, 'Delete', anything)
 
-      provider.delete(context, {name: 'foo'})
+      provider.delete(context, name: 'foo')
     end
   end
 end

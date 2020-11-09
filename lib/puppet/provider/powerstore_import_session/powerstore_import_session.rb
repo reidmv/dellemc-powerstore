@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreImportSession::PowerstoreImportSession
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,20 +83,20 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     import_session = {}
-    import_session["automatic_cutover"] = resource[:automatic_cutover] unless resource[:automatic_cutover].nil?
-    import_session["description"] = resource[:description] unless resource[:description].nil?
-    import_session["name"] = resource[:name] unless resource[:name].nil?
-    import_session["protection_policy_id"] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
-    import_session["remote_system_id"] = resource[:remote_system_id] unless resource[:remote_system_id].nil?
-    import_session["scheduled_timestamp"] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
-    import_session["source_resource_id"] = resource[:source_resource_id] unless resource[:source_resource_id].nil?
-    import_session["volume_group_id"] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
+    import_session['automatic_cutover'] = resource[:automatic_cutover] unless resource[:automatic_cutover].nil?
+    import_session['description'] = resource[:description] unless resource[:description].nil?
+    import_session['name'] = resource[:name] unless resource[:name].nil?
+    import_session['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
+    import_session['remote_system_id'] = resource[:remote_system_id] unless resource[:remote_system_id].nil?
+    import_session['scheduled_timestamp'] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
+    import_session['source_resource_id'] = resource[:source_resource_id] unless resource[:source_resource_id].nil?
+    import_session['volume_group_id'] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
     return import_session
   end
 
   def build_update_hash(resource)
     import_session = {}
-    import_session["scheduled_timestamp"] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
+    import_session['scheduled_timestamp'] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
     return import_session
   end
 
@@ -108,40 +107,36 @@ context.debug("Entered get")
 
   def build_hash(resource)
     import_session = {}
-    import_session["automatic_cutover"] = resource[:automatic_cutover] unless resource[:automatic_cutover].nil?
-    import_session["average_transfer_rate"] = resource[:average_transfer_rate] unless resource[:average_transfer_rate].nil?
-    import_session["current_transfer_rate"] = resource[:current_transfer_rate] unless resource[:current_transfer_rate].nil?
-    import_session["description"] = resource[:description] unless resource[:description].nil?
-    import_session["destination_resource_id"] = resource[:destination_resource_id] unless resource[:destination_resource_id].nil?
-    import_session["destination_resource_type"] = resource[:destination_resource_type] unless resource[:destination_resource_type].nil?
-    import_session["destination_resource_type_l10n"] = resource[:destination_resource_type_l10n] unless resource[:destination_resource_type_l10n].nil?
-    import_session["error"] = resource[:error] unless resource[:error].nil?
-    import_session["estimated_completion_timestamp"] = resource[:estimated_completion_timestamp] unless resource[:estimated_completion_timestamp].nil?
-    import_session["id"] = resource[:id] unless resource[:id].nil?
-    import_session["last_update_timestamp"] = resource[:last_update_timestamp] unless resource[:last_update_timestamp].nil?
-    import_session["name"] = resource[:name] unless resource[:name].nil?
-    import_session["parent_session_id"] = resource[:parent_session_id] unless resource[:parent_session_id].nil?
-    import_session["progress_percentage"] = resource[:progress_percentage] unless resource[:progress_percentage].nil?
-    import_session["protection_policy_id"] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
-    import_session["remote_system_id"] = resource[:remote_system_id] unless resource[:remote_system_id].nil?
-    import_session["scheduled_timestamp"] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
-    import_session["source_resource_id"] = resource[:source_resource_id] unless resource[:source_resource_id].nil?
-    import_session["state"] = resource[:state] unless resource[:state].nil?
-    import_session["state_l10n"] = resource[:state_l10n] unless resource[:state_l10n].nil?
-    import_session["volume_group_id"] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
+    import_session['automatic_cutover'] = resource[:automatic_cutover] unless resource[:automatic_cutover].nil?
+    import_session['average_transfer_rate'] = resource[:average_transfer_rate] unless resource[:average_transfer_rate].nil?
+    import_session['current_transfer_rate'] = resource[:current_transfer_rate] unless resource[:current_transfer_rate].nil?
+    import_session['description'] = resource[:description] unless resource[:description].nil?
+    import_session['destination_resource_id'] = resource[:destination_resource_id] unless resource[:destination_resource_id].nil?
+    import_session['destination_resource_type'] = resource[:destination_resource_type] unless resource[:destination_resource_type].nil?
+    import_session['destination_resource_type_l10n'] = resource[:destination_resource_type_l10n] unless resource[:destination_resource_type_l10n].nil?
+    import_session['error'] = resource[:error] unless resource[:error].nil?
+    import_session['estimated_completion_timestamp'] = resource[:estimated_completion_timestamp] unless resource[:estimated_completion_timestamp].nil?
+    import_session['id'] = resource[:id] unless resource[:id].nil?
+    import_session['last_update_timestamp'] = resource[:last_update_timestamp] unless resource[:last_update_timestamp].nil?
+    import_session['name'] = resource[:name] unless resource[:name].nil?
+    import_session['parent_session_id'] = resource[:parent_session_id] unless resource[:parent_session_id].nil?
+    import_session['progress_percentage'] = resource[:progress_percentage] unless resource[:progress_percentage].nil?
+    import_session['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
+    import_session['remote_system_id'] = resource[:remote_system_id] unless resource[:remote_system_id].nil?
+    import_session['scheduled_timestamp'] = resource[:scheduled_timestamp] unless resource[:scheduled_timestamp].nil?
+    import_session['source_resource_id'] = resource[:source_resource_id] unless resource[:source_resource_id].nil?
+    import_session['state'] = resource[:state] unless resource[:state].nil?
+    import_session['state_l10n'] = resource[:state_l10n] unless resource[:state_l10n].nil?
+    import_session['volume_group_id'] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
     return import_session
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -387,8 +382,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -407,16 +402,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 

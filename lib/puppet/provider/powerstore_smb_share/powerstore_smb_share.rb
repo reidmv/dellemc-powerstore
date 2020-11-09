@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,28 +83,28 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     smb_share = {}
-    smb_share["description"] = resource[:description] unless resource[:description].nil?
-    smb_share["file_system_id"] = resource[:file_system_id] unless resource[:file_system_id].nil?
-    smb_share["is_ABE_enabled"] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
-    smb_share["is_branch_cache_enabled"] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
-    smb_share["is_continuous_availability_enabled"] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
-    smb_share["is_encryption_enabled"] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
-    smb_share["name"] = resource[:name] unless resource[:name].nil?
-    smb_share["offline_availability"] = resource[:offline_availability] unless resource[:offline_availability].nil?
-    smb_share["path"] = resource[:path] unless resource[:path].nil?
-    smb_share["umask"] = resource[:umask] unless resource[:umask].nil?
+    smb_share['description'] = resource[:description] unless resource[:description].nil?
+    smb_share['file_system_id'] = resource[:file_system_id] unless resource[:file_system_id].nil?
+    smb_share['is_ABE_enabled'] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
+    smb_share['is_branch_cache_enabled'] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
+    smb_share['is_continuous_availability_enabled'] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
+    smb_share['is_encryption_enabled'] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
+    smb_share['name'] = resource[:name] unless resource[:name].nil?
+    smb_share['offline_availability'] = resource[:offline_availability] unless resource[:offline_availability].nil?
+    smb_share['path'] = resource[:path] unless resource[:path].nil?
+    smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
     return smb_share
   end
 
   def build_update_hash(resource)
     smb_share = {}
-    smb_share["description"] = resource[:description] unless resource[:description].nil?
-    smb_share["is_ABE_enabled"] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
-    smb_share["is_branch_cache_enabled"] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
-    smb_share["is_continuous_availability_enabled"] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
-    smb_share["is_encryption_enabled"] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
-    smb_share["offline_availability"] = resource[:offline_availability] unless resource[:offline_availability].nil?
-    smb_share["umask"] = resource[:umask] unless resource[:umask].nil?
+    smb_share['description'] = resource[:description] unless resource[:description].nil?
+    smb_share['is_ABE_enabled'] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
+    smb_share['is_branch_cache_enabled'] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
+    smb_share['is_continuous_availability_enabled'] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
+    smb_share['is_encryption_enabled'] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
+    smb_share['offline_availability'] = resource[:offline_availability] unless resource[:offline_availability].nil?
+    smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
     return smb_share
   end
 
@@ -116,31 +115,27 @@ context.debug("Entered get")
 
   def build_hash(resource)
     smb_share = {}
-    smb_share["description"] = resource[:description] unless resource[:description].nil?
-    smb_share["file_system_id"] = resource[:file_system_id] unless resource[:file_system_id].nil?
-    smb_share["id"] = resource[:id] unless resource[:id].nil?
-    smb_share["is_ABE_enabled"] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
-    smb_share["is_branch_cache_enabled"] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
-    smb_share["is_continuous_availability_enabled"] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
-    smb_share["is_encryption_enabled"] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
-    smb_share["name"] = resource[:name] unless resource[:name].nil?
-    smb_share["offline_availability"] = resource[:offline_availability] unless resource[:offline_availability].nil?
-    smb_share["offline_availability_l10n"] = resource[:offline_availability_l10n] unless resource[:offline_availability_l10n].nil?
-    smb_share["path"] = resource[:path] unless resource[:path].nil?
-    smb_share["umask"] = resource[:umask] unless resource[:umask].nil?
+    smb_share['description'] = resource[:description] unless resource[:description].nil?
+    smb_share['file_system_id'] = resource[:file_system_id] unless resource[:file_system_id].nil?
+    smb_share['id'] = resource[:id] unless resource[:id].nil?
+    smb_share['is_ABE_enabled'] = resource[:is_abe_enabled] unless resource[:is_abe_enabled].nil?
+    smb_share['is_branch_cache_enabled'] = resource[:is_branch_cache_enabled] unless resource[:is_branch_cache_enabled].nil?
+    smb_share['is_continuous_availability_enabled'] = resource[:is_continuous_availability_enabled] unless resource[:is_continuous_availability_enabled].nil?
+    smb_share['is_encryption_enabled'] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
+    smb_share['name'] = resource[:name] unless resource[:name].nil?
+    smb_share['offline_availability'] = resource[:offline_availability] unless resource[:offline_availability].nil?
+    smb_share['offline_availability_l10n'] = resource[:offline_availability_l10n] unless resource[:offline_availability_l10n].nil?
+    smb_share['path'] = resource[:path] unless resource[:path].nil?
+    smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
     return smb_share
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -385,8 +380,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -405,16 +400,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 

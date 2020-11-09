@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,46 +83,46 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     nfs_export = {}
-    nfs_export["anonymous_GID"] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
-    nfs_export["anonymous_UID"] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
-    nfs_export["default_access"] = resource[:default_access] unless resource[:default_access].nil?
-    nfs_export["description"] = resource[:description] unless resource[:description].nil?
-    nfs_export["file_system_id"] = resource[:file_system_id] unless resource[:file_system_id].nil?
-    nfs_export["is_no_SUID"] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
-    nfs_export["min_security"] = resource[:min_security] unless resource[:min_security].nil?
-    nfs_export["name"] = resource[:name] unless resource[:name].nil?
-    nfs_export["no_access_hosts"] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
-    nfs_export["path"] = resource[:path] unless resource[:path].nil?
-    nfs_export["read_only_hosts"] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
-    nfs_export["read_only_root_hosts"] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
-    nfs_export["read_write_hosts"] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
-    nfs_export["read_write_root_hosts"] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
+    nfs_export['anonymous_GID'] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
+    nfs_export['anonymous_UID'] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
+    nfs_export['default_access'] = resource[:default_access] unless resource[:default_access].nil?
+    nfs_export['description'] = resource[:description] unless resource[:description].nil?
+    nfs_export['file_system_id'] = resource[:file_system_id] unless resource[:file_system_id].nil?
+    nfs_export['is_no_SUID'] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
+    nfs_export['min_security'] = resource[:min_security] unless resource[:min_security].nil?
+    nfs_export['name'] = resource[:name] unless resource[:name].nil?
+    nfs_export['no_access_hosts'] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
+    nfs_export['path'] = resource[:path] unless resource[:path].nil?
+    nfs_export['read_only_hosts'] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
+    nfs_export['read_only_root_hosts'] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
+    nfs_export['read_write_hosts'] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
+    nfs_export['read_write_root_hosts'] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
     return nfs_export
   end
 
   def build_update_hash(resource)
     nfs_export = {}
-    nfs_export["add_no_access_hosts"] = resource[:add_no_access_hosts] unless resource[:add_no_access_hosts].nil?
-    nfs_export["add_read_only_hosts"] = resource[:add_read_only_hosts] unless resource[:add_read_only_hosts].nil?
-    nfs_export["add_read_only_root_hosts"] = resource[:add_read_only_root_hosts] unless resource[:add_read_only_root_hosts].nil?
-    nfs_export["add_read_write_hosts"] = resource[:add_read_write_hosts] unless resource[:add_read_write_hosts].nil?
-    nfs_export["add_read_write_root_hosts"] = resource[:add_read_write_root_hosts] unless resource[:add_read_write_root_hosts].nil?
-    nfs_export["anonymous_GID"] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
-    nfs_export["anonymous_UID"] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
-    nfs_export["default_access"] = resource[:default_access] unless resource[:default_access].nil?
-    nfs_export["description"] = resource[:description] unless resource[:description].nil?
-    nfs_export["is_no_SUID"] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
-    nfs_export["min_security"] = resource[:min_security] unless resource[:min_security].nil?
-    nfs_export["no_access_hosts"] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
-    nfs_export["read_only_hosts"] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
-    nfs_export["read_only_root_hosts"] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
-    nfs_export["read_write_hosts"] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
-    nfs_export["read_write_root_hosts"] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
-    nfs_export["remove_no_access_hosts"] = resource[:remove_no_access_hosts] unless resource[:remove_no_access_hosts].nil?
-    nfs_export["remove_read_only_hosts"] = resource[:remove_read_only_hosts] unless resource[:remove_read_only_hosts].nil?
-    nfs_export["remove_read_only_root_hosts"] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
-    nfs_export["remove_read_write_hosts"] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
-    nfs_export["remove_read_write_root_hosts"] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
+    nfs_export['add_no_access_hosts'] = resource[:add_no_access_hosts] unless resource[:add_no_access_hosts].nil?
+    nfs_export['add_read_only_hosts'] = resource[:add_read_only_hosts] unless resource[:add_read_only_hosts].nil?
+    nfs_export['add_read_only_root_hosts'] = resource[:add_read_only_root_hosts] unless resource[:add_read_only_root_hosts].nil?
+    nfs_export['add_read_write_hosts'] = resource[:add_read_write_hosts] unless resource[:add_read_write_hosts].nil?
+    nfs_export['add_read_write_root_hosts'] = resource[:add_read_write_root_hosts] unless resource[:add_read_write_root_hosts].nil?
+    nfs_export['anonymous_GID'] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
+    nfs_export['anonymous_UID'] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
+    nfs_export['default_access'] = resource[:default_access] unless resource[:default_access].nil?
+    nfs_export['description'] = resource[:description] unless resource[:description].nil?
+    nfs_export['is_no_SUID'] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
+    nfs_export['min_security'] = resource[:min_security] unless resource[:min_security].nil?
+    nfs_export['no_access_hosts'] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
+    nfs_export['read_only_hosts'] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
+    nfs_export['read_only_root_hosts'] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
+    nfs_export['read_write_hosts'] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
+    nfs_export['read_write_root_hosts'] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
+    nfs_export['remove_no_access_hosts'] = resource[:remove_no_access_hosts] unless resource[:remove_no_access_hosts].nil?
+    nfs_export['remove_read_only_hosts'] = resource[:remove_read_only_hosts] unless resource[:remove_read_only_hosts].nil?
+    nfs_export['remove_read_only_root_hosts'] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
+    nfs_export['remove_read_write_hosts'] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
+    nfs_export['remove_read_write_root_hosts'] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
     return nfs_export
   end
 
@@ -134,47 +133,43 @@ context.debug("Entered get")
 
   def build_hash(resource)
     nfs_export = {}
-    nfs_export["add_no_access_hosts"] = resource[:add_no_access_hosts] unless resource[:add_no_access_hosts].nil?
-    nfs_export["add_read_only_hosts"] = resource[:add_read_only_hosts] unless resource[:add_read_only_hosts].nil?
-    nfs_export["add_read_only_root_hosts"] = resource[:add_read_only_root_hosts] unless resource[:add_read_only_root_hosts].nil?
-    nfs_export["add_read_write_hosts"] = resource[:add_read_write_hosts] unless resource[:add_read_write_hosts].nil?
-    nfs_export["add_read_write_root_hosts"] = resource[:add_read_write_root_hosts] unless resource[:add_read_write_root_hosts].nil?
-    nfs_export["anonymous_GID"] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
-    nfs_export["anonymous_UID"] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
-    nfs_export["default_access"] = resource[:default_access] unless resource[:default_access].nil?
-    nfs_export["default_access_l10n"] = resource[:default_access_l10n] unless resource[:default_access_l10n].nil?
-    nfs_export["description"] = resource[:description] unless resource[:description].nil?
-    nfs_export["file_system_id"] = resource[:file_system_id] unless resource[:file_system_id].nil?
-    nfs_export["id"] = resource[:id] unless resource[:id].nil?
-    nfs_export["is_no_SUID"] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
-    nfs_export["min_security"] = resource[:min_security] unless resource[:min_security].nil?
-    nfs_export["min_security_l10n"] = resource[:min_security_l10n] unless resource[:min_security_l10n].nil?
-    nfs_export["name"] = resource[:name] unless resource[:name].nil?
-    nfs_export["nfs_owner_username"] = resource[:nfs_owner_username] unless resource[:nfs_owner_username].nil?
-    nfs_export["no_access_hosts"] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
-    nfs_export["path"] = resource[:path] unless resource[:path].nil?
-    nfs_export["read_only_hosts"] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
-    nfs_export["read_only_root_hosts"] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
-    nfs_export["read_write_hosts"] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
-    nfs_export["read_write_root_hosts"] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
-    nfs_export["remove_no_access_hosts"] = resource[:remove_no_access_hosts] unless resource[:remove_no_access_hosts].nil?
-    nfs_export["remove_read_only_hosts"] = resource[:remove_read_only_hosts] unless resource[:remove_read_only_hosts].nil?
-    nfs_export["remove_read_only_root_hosts"] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
-    nfs_export["remove_read_write_hosts"] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
-    nfs_export["remove_read_write_root_hosts"] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
+    nfs_export['add_no_access_hosts'] = resource[:add_no_access_hosts] unless resource[:add_no_access_hosts].nil?
+    nfs_export['add_read_only_hosts'] = resource[:add_read_only_hosts] unless resource[:add_read_only_hosts].nil?
+    nfs_export['add_read_only_root_hosts'] = resource[:add_read_only_root_hosts] unless resource[:add_read_only_root_hosts].nil?
+    nfs_export['add_read_write_hosts'] = resource[:add_read_write_hosts] unless resource[:add_read_write_hosts].nil?
+    nfs_export['add_read_write_root_hosts'] = resource[:add_read_write_root_hosts] unless resource[:add_read_write_root_hosts].nil?
+    nfs_export['anonymous_GID'] = resource[:anonymous_gid] unless resource[:anonymous_gid].nil?
+    nfs_export['anonymous_UID'] = resource[:anonymous_uid] unless resource[:anonymous_uid].nil?
+    nfs_export['default_access'] = resource[:default_access] unless resource[:default_access].nil?
+    nfs_export['default_access_l10n'] = resource[:default_access_l10n] unless resource[:default_access_l10n].nil?
+    nfs_export['description'] = resource[:description] unless resource[:description].nil?
+    nfs_export['file_system_id'] = resource[:file_system_id] unless resource[:file_system_id].nil?
+    nfs_export['id'] = resource[:id] unless resource[:id].nil?
+    nfs_export['is_no_SUID'] = resource[:is_no_suid] unless resource[:is_no_suid].nil?
+    nfs_export['min_security'] = resource[:min_security] unless resource[:min_security].nil?
+    nfs_export['min_security_l10n'] = resource[:min_security_l10n] unless resource[:min_security_l10n].nil?
+    nfs_export['name'] = resource[:name] unless resource[:name].nil?
+    nfs_export['nfs_owner_username'] = resource[:nfs_owner_username] unless resource[:nfs_owner_username].nil?
+    nfs_export['no_access_hosts'] = resource[:no_access_hosts] unless resource[:no_access_hosts].nil?
+    nfs_export['path'] = resource[:path] unless resource[:path].nil?
+    nfs_export['read_only_hosts'] = resource[:read_only_hosts] unless resource[:read_only_hosts].nil?
+    nfs_export['read_only_root_hosts'] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
+    nfs_export['read_write_hosts'] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
+    nfs_export['read_write_root_hosts'] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
+    nfs_export['remove_no_access_hosts'] = resource[:remove_no_access_hosts] unless resource[:remove_no_access_hosts].nil?
+    nfs_export['remove_read_only_hosts'] = resource[:remove_read_only_hosts] unless resource[:remove_read_only_hosts].nil?
+    nfs_export['remove_read_only_root_hosts'] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
+    nfs_export['remove_read_write_hosts'] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
+    nfs_export['remove_read_write_root_hosts'] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
     return nfs_export
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -453,8 +448,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -473,16 +468,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 

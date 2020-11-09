@@ -2,26 +2,25 @@ require 'puppet/resource_api'
 require "pry"
 
 class Puppet::Provider::PowerstoreVolumeGroup::PowerstoreVolumeGroup
-  def canonicalize(context, resources)
-    #nout to do here but seems we need to implement it
+  def canonicalize(_context, resources)
+    # nout to do here but seems we need to implement it
     resources
   end
 
   def get(context)
-context.debug("Entered get")
-      hash = self.class.fetch_all_as_hash(context)
-      context.debug("Completed get, returning hash #{hash}")
-      hash
+    context.debug("Entered get")
+    hash = self.class.fetch_all_as_hash(context)
+    context.debug("Completed get, returning hash #{hash}")
+    hash
 
   end
 
   def set(context, changes, noop: false)
     context.debug("Entered set")
 
-
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
-      #FIXME: key[:name] below hardwires the unique key of the resource to be :name
+      # FIXME: key[:name] below hardwires the unique key of the resource to be :name
       is = change.key?(:is) ? change[:is] : get(context).find { |key| key[:name] == name }
       should = change[:should]
 
@@ -32,15 +31,15 @@ context.debug("Entered get")
         create(context, name, should) unless noop
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'absent'
         context.deleting(name) do
-          # FIXME hardwired
+          # FIXME: hardwired
           should[:id] = is[:id]
           delete(context, should) unless noop
         end
       elsif is[:ensure].to_s == 'absent' && should[:ensure].to_s == 'absent'
         context.failed(name, message: 'Unexpected absent to absent change')
       elsif is[:ensure].to_s == 'present' && should[:ensure].to_s == 'present'
-          # FIXME hardwired
-          should[:id] = is[:id]
+        # FIXME: hardwired
+        should[:id] = is[:id]
         update(context, name, should)
       end
     end
@@ -49,12 +48,12 @@ context.debug("Entered get")
   def create(context, name, should)
     context.creating(name) do
       new_hash = build_create_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Create failed.  Response is #{response} and body is #{response.body}")
       end
@@ -67,12 +66,12 @@ context.debug("Entered get")
   def update(context, name, should)
     context.updating(name) do
       new_hash = build_update_hash(should)
-      new_hash.delete("id")
+      new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
       if response.is_a? Net::HTTPSuccess
         should[:ensure] = 'present'
-        Puppet.info("Added :ensure to property hash")
+        Puppet.info('Added :ensure to property hash')
       else
         raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
       end
@@ -84,64 +83,60 @@ context.debug("Entered get")
 
   def build_create_hash(resource)
     volume_group = {}
-    volume_group["description"] = resource[:description] unless resource[:description].nil?
-    volume_group["is_write_order_consistent"] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
-    volume_group["name"] = resource[:name] unless resource[:name].nil?
-    volume_group["protection_policy_id"] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
-    volume_group["volume_ids"] = resource[:volume_ids] unless resource[:volume_ids].nil?
+    volume_group['description'] = resource[:description] unless resource[:description].nil?
+    volume_group['is_write_order_consistent'] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
+    volume_group['name'] = resource[:name] unless resource[:name].nil?
+    volume_group['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
+    volume_group['volume_ids'] = resource[:volume_ids] unless resource[:volume_ids].nil?
     return volume_group
   end
 
   def build_update_hash(resource)
     volume_group = {}
-    volume_group["description"] = resource[:description] unless resource[:description].nil?
-    volume_group["force"] = resource[:force] unless resource[:force].nil?
-    volume_group["is_replication_destination"] = resource[:is_replication_destination] unless resource[:is_replication_destination].nil?
-    volume_group["is_write_order_consistent"] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
-    volume_group["name"] = resource[:name] unless resource[:name].nil?
-    volume_group["protection_policy_id"] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
+    volume_group['description'] = resource[:description] unless resource[:description].nil?
+    volume_group['force'] = resource[:force] unless resource[:force].nil?
+    volume_group['is_replication_destination'] = resource[:is_replication_destination] unless resource[:is_replication_destination].nil?
+    volume_group['is_write_order_consistent'] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
+    volume_group['name'] = resource[:name] unless resource[:name].nil?
+    volume_group['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
     return volume_group
   end
 
   def build_delete_hash(resource)
     volume_group = {}
-    volume_group["delete_members"] = resource[:delete_members] unless resource[:delete_members].nil?
+    volume_group['delete_members'] = resource[:delete_members] unless resource[:delete_members].nil?
     return volume_group
   end
 
   def build_hash(resource)
     volume_group = {}
-    volume_group["creation_timestamp"] = resource[:creation_timestamp] unless resource[:creation_timestamp].nil?
-    volume_group["delete_members"] = resource[:delete_members] unless resource[:delete_members].nil?
-    volume_group["description"] = resource[:description] unless resource[:description].nil?
-    volume_group["force"] = resource[:force] unless resource[:force].nil?
-    volume_group["id"] = resource[:id] unless resource[:id].nil?
-    volume_group["is_importing"] = resource[:is_importing] unless resource[:is_importing].nil?
-    volume_group["is_protectable"] = resource[:is_protectable] unless resource[:is_protectable].nil?
-    volume_group["is_replication_destination"] = resource[:is_replication_destination] unless resource[:is_replication_destination].nil?
-    volume_group["is_write_order_consistent"] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
-    volume_group["location_history"] = resource[:location_history] unless resource[:location_history].nil?
-    volume_group["migration_session_id"] = resource[:migration_session_id] unless resource[:migration_session_id].nil?
-    volume_group["name"] = resource[:name] unless resource[:name].nil?
-    volume_group["placement_rule"] = resource[:placement_rule] unless resource[:placement_rule].nil?
-    volume_group["protection_data"] = resource[:protection_data] unless resource[:protection_data].nil?
-    volume_group["protection_policy_id"] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
-    volume_group["type"] = resource[:type] unless resource[:type].nil?
-    volume_group["type_l10n"] = resource[:type_l10n] unless resource[:type_l10n].nil?
-    volume_group["volume_ids"] = resource[:volume_ids] unless resource[:volume_ids].nil?
+    volume_group['creation_timestamp'] = resource[:creation_timestamp] unless resource[:creation_timestamp].nil?
+    volume_group['delete_members'] = resource[:delete_members] unless resource[:delete_members].nil?
+    volume_group['description'] = resource[:description] unless resource[:description].nil?
+    volume_group['force'] = resource[:force] unless resource[:force].nil?
+    volume_group['id'] = resource[:id] unless resource[:id].nil?
+    volume_group['is_importing'] = resource[:is_importing] unless resource[:is_importing].nil?
+    volume_group['is_protectable'] = resource[:is_protectable] unless resource[:is_protectable].nil?
+    volume_group['is_replication_destination'] = resource[:is_replication_destination] unless resource[:is_replication_destination].nil?
+    volume_group['is_write_order_consistent'] = resource[:is_write_order_consistent] unless resource[:is_write_order_consistent].nil?
+    volume_group['location_history'] = resource[:location_history] unless resource[:location_history].nil?
+    volume_group['migration_session_id'] = resource[:migration_session_id] unless resource[:migration_session_id].nil?
+    volume_group['name'] = resource[:name] unless resource[:name].nil?
+    volume_group['placement_rule'] = resource[:placement_rule] unless resource[:placement_rule].nil?
+    volume_group['protection_data'] = resource[:protection_data] unless resource[:protection_data].nil?
+    volume_group['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
+    volume_group['type'] = resource[:type] unless resource[:type].nil?
+    volume_group['type_l10n'] = resource[:type_l10n] unless resource[:type_l10n].nil?
+    volume_group['volume_ids'] = resource[:volume_ids] unless resource[:volume_ids].nil?
     return volume_group
   end
 
   def self.build_key_values
     key_values = {}
     
-    key_values["api-version"] = "assets"
+    key_values['api-version'] = 'assets'
     key_values
   end
-
-  # def destroy(context)
-  #   delete(context, resource)
-  # end
 
   def delete(context, should)
     new_hash = build_delete_hash(should)
@@ -387,8 +382,8 @@ context.debug("Entered get")
   end
 
 
-  def self.authenticate(path_params, query_params, header_params, body_params)
-    return true
+  def self.authenticate(_path_params, _query_params, _header_params, _body_params)
+    true
   end
 
 
@@ -407,16 +402,13 @@ context.debug("Entered get")
   def self.to_query(hash)
     if hash
       return_value = hash.map { |x, v| "#{x}=#{v}" }.reduce { |x, v| "#{x}&#{v}" }
-      if !return_value.nil?
-        return return_value
-      end
+      return return_value unless return_value.nil?
     end
-    return ""
+    ''
   end
 
   def self.op_param(name, inquery, paramalias, namesnake)
-    operation_param = { :name => name, :inquery => inquery, :paramalias => paramalias, :namesnake => namesnake }
-    return operation_param
+    { name: name, inquery: inquery, paramalias: paramalias, namesnake: namesnake }
   end
 
 
