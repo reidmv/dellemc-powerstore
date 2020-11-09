@@ -2,10 +2,9 @@
 # to_bytes.rb
 #
 Puppet::Functions.create_function(:'to_bytes') do
-  # Converts the argument into bytes, for example 4 kB becomes 4096.
+  # @summary Converts the argument into bytes, for example 4kB becomes 4096. Takes a single string value as an argument.
   # @param arg The string containing a byte size
-  # @return converted value into bytes
-  # Takes a single string value as an argument.
+  # @return Value converted into bytes
   # Supports both decimal and binary multiples: 1 MB = 1000 KB and 1 MiB = 1024 KiB.
   dispatch :to_bytes do
     param 'Variant[Numeric,String]', :arg
