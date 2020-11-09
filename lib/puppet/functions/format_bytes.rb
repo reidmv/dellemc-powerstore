@@ -12,17 +12,17 @@ Puppet::Functions.create_function(:'format_bytes') do
   def format_bytes(bytes)
 
     powers = {
-      3 => "k",
-      6 => "M",
-      9 => "G",
-      12 => "T",
-      15 => "P",
-      18 => "E",
+      3 => 'k',
+      6 => 'M',
+      9 => 'G',
+      12 => 'T',
+      15 => 'P',
+      18 => 'E',
     }
 
     bytes = bytes.to_i
     power = 0
-    while bytes > 1000 do
+    while bytes > 1000
       bytes /= 1000.0
       power += 3
     end

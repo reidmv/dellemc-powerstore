@@ -27,12 +27,12 @@ Puppet::Functions.create_function(:'to_bytes') do
     when 'ti' then return (value * (1 << 40)).to_i
     when 'pi' then return (value * (1 << 50)).to_i
     when 'ei' then return (value * (1 << 60)).to_i
-    when 'k' then return (value * 10 ** 3).to_i
-    when 'm' then return (value * 10 ** 6).to_i
-    when 'g' then return (value * 10 ** 9).to_i
-    when 't' then return (value * 10 ** 12).to_i
-    when 'p' then return (value * 10 ** 15).to_i
-    when 'e' then return (value * 10 ** 18).to_i
+    when 'k' then return (value * 10**3).to_i
+    when 'm' then return (value * 10**6).to_i
+    when 'g' then return (value * 10**9).to_i
+    when 't' then return (value * 10**12).to_i
+    when 'p' then return (value * 10**15).to_i
+    when 'e' then return (value * 10**18).to_i
     else raise Puppet::ParseError, "to_bytes(): Unknown prefix #{prefix}"
     end
   end
