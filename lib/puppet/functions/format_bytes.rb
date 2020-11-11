@@ -10,7 +10,6 @@ Puppet::Functions.create_function(:format_bytes) do
   end
 
   def format_bytes(bytes)
-
     powers = {
       3 => 'k',
       6 => 'M',
