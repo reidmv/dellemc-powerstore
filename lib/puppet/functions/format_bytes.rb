@@ -1,7 +1,7 @@
 #
 # format_bytes.rb
 #
-Puppet::Functions.create_function(:'format_bytes') do
+Puppet::Functions.create_function(:format_bytes) do
   # @summary Converts the bytes argument into a human-readable form, for example 1000000000 bytes becomes 1GB.
   # @param bytes The size in bytes
   # @return A string containing a human-readable representation of bytes using the most appropriate unit
