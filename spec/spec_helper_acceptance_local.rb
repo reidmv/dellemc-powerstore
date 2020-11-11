@@ -17,9 +17,9 @@ def run_device(options = { allow_changes: true, allow_warnings: false, allow_err
 
   output, _status = Open3.capture2e(command)
 
-  expect(output).not_to match(%r{^(\e.*?m)?Notice: /Stage\[main\]}) unless options[:allow_changes]
-  expect(output).not_to match %r{/^(\e.*?m)?Error:/} unless options[:allow_errors]
-  expect(output).not_to match %r{/^(\e.*?m)?Warning:/} unless options[:allow_warnings]
+  expect(output).not_to match %r{^(\e.*?m)?Notice: /Stage\[main\]} unless options[:allow_changes]
+  expect(output).not_to match %r{^(\e.*?m)?Error:} unless options[:allow_errors]
+  expect(output).not_to match %r{^(\e.*?m)?Warning:} unless options[:allow_warnings]
 
   output
 end
@@ -62,7 +62,7 @@ def sample_attr_value(name, attr)
     raise "Cannot determine type of attr: #{attr}"
   end
   type = parse_type(name, type_str)
-  if name =~ %r{/timestamp/}
+  if name =~ %r{timestamp}
     DateTime.now.iso8601
   else
     sample_value(type)
