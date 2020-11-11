@@ -65,7 +65,7 @@ module Puppet::Transport
       if !query_params['query_string'].nil?
         uri_string = uri_string + '?' + query_params['query_string']
       else
-        if operation_verb == 'Get' && operation_path.include?('query')
+        if operation_verb == 'Get' # && operation_path.include?('query')
           query_params['select'] = '*'
         end
         uri_string = uri_string + '?' + to_query(query_params) unless query_params.empty?
