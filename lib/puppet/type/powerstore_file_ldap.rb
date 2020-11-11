@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_file_ldap',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Use these resources to manage the Lightweight Directory Access Protocol (LDAP) settings for the NAS Server. You can configure one LDAP settings object per NAS Server. LDAP is an application protocol for querying and modifying directory services running on TCP/IP networks. LDAP provides central management for network authentication and authorization operations by helping to centralize user and group management across the network. A NAS Server can use LDAP as a Unix Directory Service to map users, retrieve netgroups, and build a Unix credential. When an initial LDAP configuration is applied, the system checks for the type of LDAP server. It can be an Active Directory schema or an RFC 2307 schema.
   EOS

@@ -17,17 +17,20 @@ describe 'powerstore_vcenter' do
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs vcenter_instance_query' do
     result = run_task('powerstore::vcenter_instance_query', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs vcenter_delete' do
     result = run_task('powerstore::vcenter_delete', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
+
   it 'performs vcenter_create' do
     result = run_task('powerstore::vcenter_create', 'sut', sample_task_parameters('vcenter_create'), config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
-  end
+end

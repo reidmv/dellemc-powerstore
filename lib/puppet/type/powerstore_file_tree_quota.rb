@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_file_tree_quota',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Tree quota settings in the storage system. A tree quota instance represents a quota limit applied to a specific directory tree in a file system.
   EOS

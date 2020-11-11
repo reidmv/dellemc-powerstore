@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
 class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -92,18 +87,20 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
     import_host_system['os_type'] = resource[:os_type] unless resource[:os_type].nil?
     import_host_system['password'] = resource[:password] unless resource[:password].nil?
     import_host_system['user_name'] = resource[:user_name] unless resource[:user_name].nil?
-    return import_host_system
+    import_host_system
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_update_hash(resource)
     import_host_system = {}
-    return import_host_system
+    import_host_system
   end
-
+  # rubocop:enable Lint/UnusedMethodArgument
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     import_host_system = {}
-    return import_host_system
+    import_host_system
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     import_host_system = {}
@@ -126,12 +123,11 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
     import_host_system['os_version'] = resource[:os_version] unless resource[:os_version].nil?
     import_host_system['password'] = resource[:password] unless resource[:password].nil?
     import_host_system['user_name'] = resource[:user_name] unless resource[:user_name].nil?
-    return import_host_system
+    import_host_system
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -139,26 +135,23 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation import_host_system_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation import_host_system_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -176,28 +169,28 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation import_host_system_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation import_host_system_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('agent_address', 'body', 'agent_address', 'agent_address'),
-      self.op_param('agent_port', 'body', 'agent_port', 'agent_port'),
-      self.op_param('chap_mutual_password', 'body', 'chap_mutual_password', 'chap_mutual_password'),
-      self.op_param('chap_mutual_username', 'body', 'chap_mutual_username', 'chap_mutual_username'),
-      self.op_param('chap_single_password', 'body', 'chap_single_password', 'chap_single_password'),
-      self.op_param('chap_single_username', 'body', 'chap_single_username', 'chap_single_username'),
-      self.op_param('os_type', 'body', 'os_type', 'os_type'),
-      self.op_param('password', 'body', 'password', 'password'),
-      self.op_param('user_name', 'body', 'user_name', 'user_name'),
+      op_param('agent_address', 'body', 'agent_address', 'agent_address'),
+      op_param('agent_port', 'body', 'agent_port', 'agent_port'),
+      op_param('chap_mutual_password', 'body', 'chap_mutual_password', 'chap_mutual_password'),
+      op_param('chap_mutual_username', 'body', 'chap_mutual_username', 'chap_mutual_username'),
+      op_param('chap_single_password', 'body', 'chap_single_password', 'chap_single_password'),
+      op_param('chap_single_username', 'body', 'chap_single_username', 'chap_single_username'),
+      op_param('os_type', 'body', 'os_type', 'os_type'),
+      op_param('password', 'body', 'password', 'password'),
+      op_param('user_name', 'body', 'user_name', 'user_name'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -214,22 +207,22 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system', 'Post', 'application/json')
   end
 
 
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation import_host_system_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation import_host_system_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -246,22 +239,22 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation import_host_system_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation import_host_system_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -278,16 +271,15 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/import_host_system/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           agent_address: item['agent_address'],
           agent_api_version: item['agent_api_version'],
           agent_port: item['agent_port'],
@@ -310,45 +302,37 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -362,9 +346,7 @@ class Puppet::Provider::PowerstoreImportHostSystem::PowerstoreImportHostSystem
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

@@ -17,17 +17,20 @@ describe 'powerstore_policy' do
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs policy_instance_query' do
     result = run_task('powerstore::policy_instance_query', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs policy_delete' do
     result = run_task('powerstore::policy_delete', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
+
   it 'performs policy_create' do
     result = run_task('powerstore::policy_create', 'sut', sample_task_parameters('policy_create'), config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
-  end
+end

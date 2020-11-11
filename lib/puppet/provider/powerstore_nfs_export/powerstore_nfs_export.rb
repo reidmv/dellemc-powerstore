@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
 class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -97,9 +92,8 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
     nfs_export['read_only_root_hosts'] = resource[:read_only_root_hosts] unless resource[:read_only_root_hosts].nil?
     nfs_export['read_write_hosts'] = resource[:read_write_hosts] unless resource[:read_write_hosts].nil?
     nfs_export['read_write_root_hosts'] = resource[:read_write_root_hosts] unless resource[:read_write_root_hosts].nil?
-    return nfs_export
+    nfs_export
   end
-
   def build_update_hash(resource)
     nfs_export = {}
     nfs_export['add_no_access_hosts'] = resource[:add_no_access_hosts] unless resource[:add_no_access_hosts].nil?
@@ -123,13 +117,14 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
     nfs_export['remove_read_only_root_hosts'] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
     nfs_export['remove_read_write_hosts'] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
     nfs_export['remove_read_write_root_hosts'] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
-    return nfs_export
+    nfs_export
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     nfs_export = {}
-    return nfs_export
+    nfs_export
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     nfs_export = {}
@@ -161,12 +156,11 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
     nfs_export['remove_read_only_root_hosts'] = resource[:remove_read_only_root_hosts] unless resource[:remove_read_only_root_hosts].nil?
     nfs_export['remove_read_write_hosts'] = resource[:remove_read_write_hosts] unless resource[:remove_read_write_hosts].nil?
     nfs_export['remove_read_write_root_hosts'] = resource[:remove_read_write_root_hosts] unless resource[:remove_read_write_root_hosts].nil?
-    return nfs_export
+    nfs_export
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -174,26 +168,23 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nfs_export_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation nfs_export_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -211,33 +202,33 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nfs_export_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation nfs_export_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('anonymous_GID', 'body', 'anonymous_gid', 'anonymous_gid'),
-      self.op_param('anonymous_UID', 'body', 'anonymous_uid', 'anonymous_uid'),
-      self.op_param('default_access', 'body', 'default_access', 'default_access'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('file_system_id', 'body', 'file_system_id', 'file_system_id'),
-      self.op_param('is_no_SUID', 'body', 'is_no_suid', 'is_no_suid'),
-      self.op_param('min_security', 'body', 'min_security', 'min_security'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('no_access_hosts', 'body', 'no_access_hosts', 'no_access_hosts'),
-      self.op_param('path', 'body', 'path', 'path'),
-      self.op_param('read_only_hosts', 'body', 'read_only_hosts', 'read_only_hosts'),
-      self.op_param('read_only_root_hosts', 'body', 'read_only_root_hosts', 'read_only_root_hosts'),
-      self.op_param('read_write_hosts', 'body', 'read_write_hosts', 'read_write_hosts'),
-      self.op_param('read_write_root_hosts', 'body', 'read_write_root_hosts', 'read_write_root_hosts'),
+      op_param('anonymous_GID', 'body', 'anonymous_gid', 'anonymous_gid'),
+      op_param('anonymous_UID', 'body', 'anonymous_uid', 'anonymous_uid'),
+      op_param('default_access', 'body', 'default_access', 'default_access'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('file_system_id', 'body', 'file_system_id', 'file_system_id'),
+      op_param('is_no_SUID', 'body', 'is_no_suid', 'is_no_suid'),
+      op_param('min_security', 'body', 'min_security', 'min_security'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('no_access_hosts', 'body', 'no_access_hosts', 'no_access_hosts'),
+      op_param('path', 'body', 'path', 'path'),
+      op_param('read_only_hosts', 'body', 'read_only_hosts', 'read_only_hosts'),
+      op_param('read_only_root_hosts', 'body', 'read_only_root_hosts', 'read_only_root_hosts'),
+      op_param('read_write_hosts', 'body', 'read_write_hosts', 'read_write_hosts'),
+      op_param('read_write_root_hosts', 'body', 'read_write_root_hosts', 'read_write_root_hosts'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -254,41 +245,41 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nfs_export_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation nfs_export_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('add_no_access_hosts', 'body', 'add_no_access_hosts', 'add_no_access_hosts'),
-      self.op_param('add_read_only_hosts', 'body', 'add_read_only_hosts', 'add_read_only_hosts'),
-      self.op_param('add_read_only_root_hosts', 'body', 'add_read_only_root_hosts', 'add_read_only_root_hosts'),
-      self.op_param('add_read_write_hosts', 'body', 'add_read_write_hosts', 'add_read_write_hosts'),
-      self.op_param('add_read_write_root_hosts', 'body', 'add_read_write_root_hosts', 'add_read_write_root_hosts'),
-      self.op_param('anonymous_GID', 'body', 'anonymous_gid', 'anonymous_gid'),
-      self.op_param('anonymous_UID', 'body', 'anonymous_uid', 'anonymous_uid'),
-      self.op_param('default_access', 'body', 'default_access', 'default_access'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_no_SUID', 'body', 'is_no_suid', 'is_no_suid'),
-      self.op_param('min_security', 'body', 'min_security', 'min_security'),
-      self.op_param('no_access_hosts', 'body', 'no_access_hosts', 'no_access_hosts'),
-      self.op_param('read_only_hosts', 'body', 'read_only_hosts', 'read_only_hosts'),
-      self.op_param('read_only_root_hosts', 'body', 'read_only_root_hosts', 'read_only_root_hosts'),
-      self.op_param('read_write_hosts', 'body', 'read_write_hosts', 'read_write_hosts'),
-      self.op_param('read_write_root_hosts', 'body', 'read_write_root_hosts', 'read_write_root_hosts'),
-      self.op_param('remove_no_access_hosts', 'body', 'remove_no_access_hosts', 'remove_no_access_hosts'),
-      self.op_param('remove_read_only_hosts', 'body', 'remove_read_only_hosts', 'remove_read_only_hosts'),
-      self.op_param('remove_read_only_root_hosts', 'body', 'remove_read_only_root_hosts', 'remove_read_only_root_hosts'),
-      self.op_param('remove_read_write_hosts', 'body', 'remove_read_write_hosts', 'remove_read_write_hosts'),
-      self.op_param('remove_read_write_root_hosts', 'body', 'remove_read_write_root_hosts', 'remove_read_write_root_hosts'),
+      op_param('add_no_access_hosts', 'body', 'add_no_access_hosts', 'add_no_access_hosts'),
+      op_param('add_read_only_hosts', 'body', 'add_read_only_hosts', 'add_read_only_hosts'),
+      op_param('add_read_only_root_hosts', 'body', 'add_read_only_root_hosts', 'add_read_only_root_hosts'),
+      op_param('add_read_write_hosts', 'body', 'add_read_write_hosts', 'add_read_write_hosts'),
+      op_param('add_read_write_root_hosts', 'body', 'add_read_write_root_hosts', 'add_read_write_root_hosts'),
+      op_param('anonymous_GID', 'body', 'anonymous_gid', 'anonymous_gid'),
+      op_param('anonymous_UID', 'body', 'anonymous_uid', 'anonymous_uid'),
+      op_param('default_access', 'body', 'default_access', 'default_access'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_no_SUID', 'body', 'is_no_suid', 'is_no_suid'),
+      op_param('min_security', 'body', 'min_security', 'min_security'),
+      op_param('no_access_hosts', 'body', 'no_access_hosts', 'no_access_hosts'),
+      op_param('read_only_hosts', 'body', 'read_only_hosts', 'read_only_hosts'),
+      op_param('read_only_root_hosts', 'body', 'read_only_root_hosts', 'read_only_root_hosts'),
+      op_param('read_write_hosts', 'body', 'read_write_hosts', 'read_write_hosts'),
+      op_param('read_write_root_hosts', 'body', 'read_write_root_hosts', 'read_write_root_hosts'),
+      op_param('remove_no_access_hosts', 'body', 'remove_no_access_hosts', 'remove_no_access_hosts'),
+      op_param('remove_read_only_hosts', 'body', 'remove_read_only_hosts', 'remove_read_only_hosts'),
+      op_param('remove_read_only_root_hosts', 'body', 'remove_read_only_root_hosts', 'remove_read_only_root_hosts'),
+      op_param('remove_read_write_hosts', 'body', 'remove_read_write_hosts', 'remove_read_write_hosts'),
+      op_param('remove_read_write_root_hosts', 'body', 'remove_read_write_root_hosts', 'remove_read_write_root_hosts'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -305,20 +296,20 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nfs_export_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation nfs_export_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -335,22 +326,22 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nfs_export_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation nfs_export_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -367,16 +358,15 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nfs_export/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           add_no_access_hosts: item['add_no_access_hosts'],
           add_read_only_hosts: item['add_read_only_hosts'],
           add_read_only_root_hosts: item['add_read_only_root_hosts'],
@@ -408,45 +398,37 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -460,9 +442,7 @@ class Puppet::Provider::PowerstoreNfsExport::PowerstoreNfsExport
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

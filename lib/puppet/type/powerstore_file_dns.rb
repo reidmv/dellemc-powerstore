@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_file_dns',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Use these resources to configure the Domain Name System (DNS) settings for a NAS server. One DNS settings object may be configured per NAS server. A DNS is a hierarchical system responsible for converting domain names to their corresponding IP addresses. A NAS server\'s DNS settings should allow DNS resolution of all names within an SMB server\'s domain in order for the SMB protocol to operate normally within an Active Directory domain. The DNS default port is 53.
   EOS

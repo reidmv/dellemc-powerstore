@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
 class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -95,9 +90,8 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
     volume['sector_size'] = resource[:sector_size] unless resource[:sector_size].nil?
     volume['size'] = resource[:size] unless resource[:size].nil?
     volume['volume_group_id'] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
-    return volume
+    volume
   end
-
   def build_update_hash(resource)
     volume = {}
     volume['description'] = resource[:description] unless resource[:description].nil?
@@ -109,13 +103,14 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
     volume['performance_policy_id'] = resource[:performance_policy_id] unless resource[:performance_policy_id].nil?
     volume['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
     volume['size'] = resource[:size] unless resource[:size].nil?
-    return volume
+    volume
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     volume = {}
-    return volume
+    volume
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     volume = {}
@@ -146,12 +141,11 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
     volume['type_l10n'] = resource[:type_l10n] unless resource[:type_l10n].nil?
     volume['volume_group_id'] = resource[:volume_group_id] unless resource[:volume_group_id].nil?
     volume['wwn'] = resource[:wwn] unless resource[:wwn].nil?
-    return volume
+    volume
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -159,26 +153,23 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation volume_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation volume_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -196,31 +187,31 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation volume_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation volume_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('appliance_id', 'body', 'appliance_id', 'appliance_id'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('host_group_id', 'body', 'host_group_id', 'host_group_id'),
-      self.op_param('host_id', 'body', 'host_id', 'host_id'),
-      self.op_param('logical_unit_number', 'body', 'logical_unit_number', 'logical_unit_number'),
-      self.op_param('min_size', 'body', 'min_size', 'min_size'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('performance_policy_id', 'body', 'performance_policy_id', 'performance_policy_id'),
-      self.op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
-      self.op_param('sector_size', 'body', 'sector_size', 'sector_size'),
-      self.op_param('size', 'body', 'size', 'size'),
-      self.op_param('volume_group_id', 'body', 'volume_group_id', 'volume_group_id'),
+      op_param('appliance_id', 'body', 'appliance_id', 'appliance_id'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('host_group_id', 'body', 'host_group_id', 'host_group_id'),
+      op_param('host_id', 'body', 'host_id', 'host_id'),
+      op_param('logical_unit_number', 'body', 'logical_unit_number', 'logical_unit_number'),
+      op_param('min_size', 'body', 'min_size', 'min_size'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('performance_policy_id', 'body', 'performance_policy_id', 'performance_policy_id'),
+      op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
+      op_param('sector_size', 'body', 'sector_size', 'sector_size'),
+      op_param('size', 'body', 'size', 'size'),
+      op_param('volume_group_id', 'body', 'volume_group_id', 'volume_group_id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -237,29 +228,29 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation volume_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation volume_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('expiration_timestamp', 'body', 'expiration_timestamp', 'expiration_timestamp'),
-      self.op_param('force', 'body', 'force', 'force'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_replication_destination', 'body', 'is_replication_destination', 'is_replication_destination'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('node_affinity', 'body', 'node_affinity', 'node_affinity'),
-      self.op_param('performance_policy_id', 'body', 'performance_policy_id', 'performance_policy_id'),
-      self.op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
-      self.op_param('size', 'body', 'size', 'size'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('expiration_timestamp', 'body', 'expiration_timestamp', 'expiration_timestamp'),
+      op_param('force', 'body', 'force', 'force'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_replication_destination', 'body', 'is_replication_destination', 'is_replication_destination'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('node_affinity', 'body', 'node_affinity', 'node_affinity'),
+      op_param('performance_policy_id', 'body', 'performance_policy_id', 'performance_policy_id'),
+      op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
+      op_param('size', 'body', 'size', 'size'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -276,20 +267,20 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation volume_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation volume_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -306,22 +297,22 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation volume_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation volume_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -338,16 +329,15 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/volume/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           appliance_id: item['appliance_id'],
           creation_timestamp: item['creation_timestamp'],
           description: item['description'],
@@ -378,45 +368,37 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -430,9 +412,7 @@ class Puppet::Provider::PowerstoreVolume::PowerstoreVolume
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

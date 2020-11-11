@@ -18,22 +18,6 @@ RSpec.describe Puppet::Provider::PowerstoreMigrationSession::PowerstoreMigration
     allow(transport).to receive(:call_op).and_return(response)
   end
 
-  # describe '#get' do
-  #   it 'processes resources' do
-  #     expect(context).to receive(:debug).with('Returning pre-canned example data')
-  #     expect(provider.get(context)).to eq [
-  #       {
-  #         name: 'foo',
-  #         ensure: 'present',
-  #       },
-  #       {
-  #         name: 'bar',
-  #         ensure: 'present',
-  #       },
-  #     ]
-  #   end
-  # end
-
   describe 'create(context, name, should)' do
     it 'creates the resource' do
       allow(context).to receive(:creating).with('bar').and_yield
@@ -43,9 +27,8 @@ RSpec.describe Puppet::Provider::PowerstoreMigrationSession::PowerstoreMigration
     end
   end
 
-
   describe 'delete(context, should)' do
-    it 'deletes the resource' do
+    it 'delete the resource' do
       expect(transport).to receive(:call_op).with(any_args, 'Delete', anything)
 
       provider.delete(context, name: 'foo')

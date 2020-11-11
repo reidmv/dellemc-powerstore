@@ -15,8 +15,6 @@ describe type_name do
     result = run_device(allow_changes: true)
     expect(result).to match(%r{Applied catalog.*})
   end
-
-  
   it "updates #{type_name}", :update do
     namevars_value = 'string' if ENV['MOCK_ACCEPTANCE']
     r = sample_resource(type_name, ensure: :present, namevars_value: namevars_value)
@@ -25,7 +23,6 @@ describe type_name do
     result = run_device(allow_changes: true)
     expect(result).to match(%r{Applied catalog.*})
   end
-  
 
   it "delete #{type_name}" do
     namevars_value = 'string' if ENV['MOCK_ACCEPTANCE']

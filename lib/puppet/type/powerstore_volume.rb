@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_volume',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Manage volumes, including snapshots and clones of volumes.
   EOS

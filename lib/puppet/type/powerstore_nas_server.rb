@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_nas_server',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Use these resource types to manage NAS servers. NAS servers are software components used to transfer data and provide the connection ports for hosts to access file-based storage resources. NAS servers are independent from each other.
   EOS

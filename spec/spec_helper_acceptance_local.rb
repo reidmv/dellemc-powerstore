@@ -99,8 +99,9 @@ def sample_value(type)
   when 'String'
     min_length = type.size_type.from if !type.size_type.nil? && !type.size_type.from.nil?
     max_length = type.size_type.to if !type.size_type.nil? && !type.size_type.to.nil?
-    length = !min_length or min_length < 8 ? 8 : min_length
+    length = (!min_length || min_length < 8) ? 8 : min_length
     length = max_length if max_length && length > max_length
+    # rubocop:disable Performance/TimesMap
     length.times.map { [*'0'..'9', *'a'..'z', *'A'..'Z'].sample }.join
   when 'Integer'
     if !type.from.nil? && !type.to.nil?
@@ -115,10 +116,10 @@ def sample_value(type)
   when 'Hash'
     { sample_value(type.key_type) => sample_value(type.value_type) }
   when 'Struct'
-    type.elements.reduce({}) { |retval, el|
+    type.elements.reduce({}) do |retval, el|
       retval[el.name] = sample_value(el.value_type)
       retval
-    }
+    end
   when 'Enum'
     type.values[0]
   when 'Any'
@@ -130,7 +131,7 @@ end
 
 RSpec.configure do |c|
   c.filter_run_excluding(bolt: true) unless ENV['GEM_BOLT']
-
+  # rubocop:disable Style/TernaryParentheses
   mode = ENV['MOCK_ACCEPTANCE'] ? 'mock' : 'device'
 
   c.filter_run_excluding(update: true) unless mode == 'device'
@@ -138,7 +139,7 @@ RSpec.configure do |c|
   device = {
     'user'     => ENV['DEVICE_USER'] || 'admin',
     'password' => ENV['DEVICE_PASSWORD'] || 'Dell!2020',
-    'host'     => ENV['DEVICE_IP'] || '10.119.0.150'
+    'host'     => ENV['DEVICE_IP'] || '10.119.0.150',
   }
 
   mock = {
@@ -147,11 +148,11 @@ RSpec.configure do |c|
     'user'      => 'admin',
     'password'  => 'admin',
     'schema'    => 'http',
-    'base_path' => ''
+    'base_path' => '',
   }
 
   FileUtils.mkdir_p('spec/fixtures/modules') unless Dir.exist?('spec/fixtures/modules')
-  FileUtils.ln_sf("#{Dir.getwd}", "#{Dir.getwd}/spec/fixtures/modules/powerstore")
+  FileUtils.ln_sf(Dir.getwd.to_s, "#{Dir.getwd}/spec/fixtures/modules/powerstore")
 
   if mode == 'device'
     if device['user'].empty? || device['password'].empty? || device['host'].empty?
@@ -168,6 +169,7 @@ RSpec.configure do |c|
     file.puts JSON.generate(sut)
   end
 
+  # rubocop:disable all
   File.open('spec/fixtures/acceptance-device.conf', 'w') do |file|
     file.puts <<~DEVICE
       [sut]
@@ -175,15 +177,16 @@ RSpec.configure do |c|
       url file://#{Dir.getwd}/spec/fixtures/sut.json
     DEVICE
   end
+  # rubocop:enable all
   inventory = {
     'version' => 2,
-    'targets' => [
-      'uri' => sut['host'],
-      'name' => 'sut',
+    'targets' => [{
+      'uri'    => sut['host'],
+      'name'   => 'sut',
       'config' => {
-        'transport' => 'remote'
-      }
-    ]
+        'transport' => 'remote',
+      },
+    }],
   }
   inventory['targets'][0]['config']['remote'] = sut
   inventory['targets'][0]['config']['remote']['remote-transport'] = 'powerstore'

@@ -4,7 +4,8 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_storage_container',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     Manage storage containers. A storage container is a logical grouping of related storage objects in a cluster. A storage container corresponds to a vVol datastore in vCenter and is used to group related vVols and track the amount of space that is used/free.
   EOS

@@ -16,8 +16,6 @@ describe type_name do
     expect(result).to match(%r{Applied catalog.*})
   end
 
-  
-
   it "delete #{type_name}" do
     namevars_value = 'string' if ENV['MOCK_ACCEPTANCE']
     r = sample_resource(type_name, ensure: :absent, namevars_value: namevars_value)

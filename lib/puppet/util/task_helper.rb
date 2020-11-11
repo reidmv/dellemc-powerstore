@@ -15,6 +15,7 @@ class TaskHelper
     @transport = {}
   end
 
+  # Error
   class Error < RuntimeError
     attr_reader :kind, :details, :issue_code
 
@@ -55,7 +56,7 @@ class TaskHelper
     @credentials ||= target.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
   end
 
-  def task(params = {})
+  def task(_params = {})
     msg = 'The task author must implement the `task` method in the task'
     raise TaskHelper::Error.new(msg, 'tasklib/not-implemented')
   end
@@ -64,15 +65,11 @@ class TaskHelper
   def self.run
     task = new
     # support debugging by reading command line arguments
-    if ARGV.size > 0
-      input = ARGV[0]
-    else
-      input = STDIN.read
-    end
+    input = ARGV.empty? ? STDIN.read : ARGV[0]
     params = walk_keys(JSON.parse(input))
-    task.target = params[:'_target']
+    task.target = params[:_target]
 
-    add_plugin_paths(params[:'_installdir']) if params.key? :'_installdir'
+    add_plugin_paths(params[:_installdir]) if params.key? :_installdir
 
     result = task.task(params)
 
@@ -87,7 +84,7 @@ class TaskHelper
   rescue StandardError => e
     details = {
       'backtrace' => e.backtrace,
-      'debug' => task.debug_statements
+      'debug' => task.debug_statements,
     }.compact
 
     error = TaskHelper::Error.new(e.message, e.class.to_s, details)

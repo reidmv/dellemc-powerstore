@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
 class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -98,9 +93,8 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
     file_system['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
     file_system['size_total'] = resource[:size_total] unless resource[:size_total].nil?
     file_system['smb_notify_on_change_dir_depth'] = resource[:smb_notify_on_change_dir_depth] unless resource[:smb_notify_on_change_dir_depth].nil?
-    return file_system
+    file_system
   end
-
   def build_update_hash(resource)
     file_system = {}
     file_system['access_policy'] = resource[:access_policy] unless resource[:access_policy].nil?
@@ -121,13 +115,14 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
     file_system['protection_policy_id'] = resource[:protection_policy_id] unless resource[:protection_policy_id].nil?
     file_system['size_total'] = resource[:size_total] unless resource[:size_total].nil?
     file_system['smb_notify_on_change_dir_depth'] = resource[:smb_notify_on_change_dir_depth] unless resource[:smb_notify_on_change_dir_depth].nil?
-    return file_system
+    file_system
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     file_system = {}
-    return file_system
+    file_system
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     file_system = {}
@@ -167,12 +162,11 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
     file_system['size_total'] = resource[:size_total] unless resource[:size_total].nil?
     file_system['size_used'] = resource[:size_used] unless resource[:size_used].nil?
     file_system['smb_notify_on_change_dir_depth'] = resource[:smb_notify_on_change_dir_depth] unless resource[:smb_notify_on_change_dir_depth].nil?
-    return file_system
+    file_system
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -180,26 +174,23 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation file_system_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation file_system_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -217,34 +208,34 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation file_system_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation file_system_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('access_policy', 'body', 'access_policy', 'access_policy'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('folder_rename_policy', 'body', 'folder_rename_policy', 'folder_rename_policy'),
-      self.op_param('is_async_MTime_enabled', 'body', 'is_async_m_time_enabled', 'is_async_m_time_enabled'),
-      self.op_param('is_smb_no_notify_enabled', 'body', 'is_smb_no_notify_enabled', 'is_smb_no_notify_enabled'),
-      self.op_param('is_smb_notify_on_access_enabled', 'body', 'is_smb_notify_on_access_enabled', 'is_smb_notify_on_access_enabled'),
-      self.op_param('is_smb_notify_on_write_enabled', 'body', 'is_smb_notify_on_write_enabled', 'is_smb_notify_on_write_enabled'),
-      self.op_param('is_smb_op_locks_enabled', 'body', 'is_smb_op_locks_enabled', 'is_smb_op_locks_enabled'),
-      self.op_param('is_smb_sync_writes_enabled', 'body', 'is_smb_sync_writes_enabled', 'is_smb_sync_writes_enabled'),
-      self.op_param('locking_policy', 'body', 'locking_policy', 'locking_policy'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('nas_server_id', 'body', 'nas_server_id', 'nas_server_id'),
-      self.op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
-      self.op_param('size_total', 'body', 'size_total', 'size_total'),
-      self.op_param('smb_notify_on_change_dir_depth', 'body', 'smb_notify_on_change_dir_depth', 'smb_notify_on_change_dir_depth'),
+      op_param('access_policy', 'body', 'access_policy', 'access_policy'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('folder_rename_policy', 'body', 'folder_rename_policy', 'folder_rename_policy'),
+      op_param('is_async_MTime_enabled', 'body', 'is_async_m_time_enabled', 'is_async_m_time_enabled'),
+      op_param('is_smb_no_notify_enabled', 'body', 'is_smb_no_notify_enabled', 'is_smb_no_notify_enabled'),
+      op_param('is_smb_notify_on_access_enabled', 'body', 'is_smb_notify_on_access_enabled', 'is_smb_notify_on_access_enabled'),
+      op_param('is_smb_notify_on_write_enabled', 'body', 'is_smb_notify_on_write_enabled', 'is_smb_notify_on_write_enabled'),
+      op_param('is_smb_op_locks_enabled', 'body', 'is_smb_op_locks_enabled', 'is_smb_op_locks_enabled'),
+      op_param('is_smb_sync_writes_enabled', 'body', 'is_smb_sync_writes_enabled', 'is_smb_sync_writes_enabled'),
+      op_param('locking_policy', 'body', 'locking_policy', 'locking_policy'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('nas_server_id', 'body', 'nas_server_id', 'nas_server_id'),
+      op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
+      op_param('size_total', 'body', 'size_total', 'size_total'),
+      op_param('smb_notify_on_change_dir_depth', 'body', 'smb_notify_on_change_dir_depth', 'smb_notify_on_change_dir_depth'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -261,38 +252,38 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation file_system_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation file_system_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('access_policy', 'body', 'access_policy', 'access_policy'),
-      self.op_param('default_hard_limit', 'body', 'default_hard_limit', 'default_hard_limit'),
-      self.op_param('default_soft_limit', 'body', 'default_soft_limit', 'default_soft_limit'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('expiration_timestamp', 'body', 'expiration_timestamp', 'expiration_timestamp'),
-      self.op_param('folder_rename_policy', 'body', 'folder_rename_policy', 'folder_rename_policy'),
-      self.op_param('grace_period', 'body', 'grace_period', 'grace_period'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_async_MTime_enabled', 'body', 'is_async_m_time_enabled', 'is_async_m_time_enabled'),
-      self.op_param('is_quota_enabled', 'body', 'is_quota_enabled', 'is_quota_enabled'),
-      self.op_param('is_smb_no_notify_enabled', 'body', 'is_smb_no_notify_enabled', 'is_smb_no_notify_enabled'),
-      self.op_param('is_smb_notify_on_access_enabled', 'body', 'is_smb_notify_on_access_enabled', 'is_smb_notify_on_access_enabled'),
-      self.op_param('is_smb_notify_on_write_enabled', 'body', 'is_smb_notify_on_write_enabled', 'is_smb_notify_on_write_enabled'),
-      self.op_param('is_smb_op_locks_enabled', 'body', 'is_smb_op_locks_enabled', 'is_smb_op_locks_enabled'),
-      self.op_param('is_smb_sync_writes_enabled', 'body', 'is_smb_sync_writes_enabled', 'is_smb_sync_writes_enabled'),
-      self.op_param('locking_policy', 'body', 'locking_policy', 'locking_policy'),
-      self.op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
-      self.op_param('size_total', 'body', 'size_total', 'size_total'),
-      self.op_param('smb_notify_on_change_dir_depth', 'body', 'smb_notify_on_change_dir_depth', 'smb_notify_on_change_dir_depth'),
+      op_param('access_policy', 'body', 'access_policy', 'access_policy'),
+      op_param('default_hard_limit', 'body', 'default_hard_limit', 'default_hard_limit'),
+      op_param('default_soft_limit', 'body', 'default_soft_limit', 'default_soft_limit'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('expiration_timestamp', 'body', 'expiration_timestamp', 'expiration_timestamp'),
+      op_param('folder_rename_policy', 'body', 'folder_rename_policy', 'folder_rename_policy'),
+      op_param('grace_period', 'body', 'grace_period', 'grace_period'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_async_MTime_enabled', 'body', 'is_async_m_time_enabled', 'is_async_m_time_enabled'),
+      op_param('is_quota_enabled', 'body', 'is_quota_enabled', 'is_quota_enabled'),
+      op_param('is_smb_no_notify_enabled', 'body', 'is_smb_no_notify_enabled', 'is_smb_no_notify_enabled'),
+      op_param('is_smb_notify_on_access_enabled', 'body', 'is_smb_notify_on_access_enabled', 'is_smb_notify_on_access_enabled'),
+      op_param('is_smb_notify_on_write_enabled', 'body', 'is_smb_notify_on_write_enabled', 'is_smb_notify_on_write_enabled'),
+      op_param('is_smb_op_locks_enabled', 'body', 'is_smb_op_locks_enabled', 'is_smb_op_locks_enabled'),
+      op_param('is_smb_sync_writes_enabled', 'body', 'is_smb_sync_writes_enabled', 'is_smb_sync_writes_enabled'),
+      op_param('locking_policy', 'body', 'locking_policy', 'locking_policy'),
+      op_param('protection_policy_id', 'body', 'protection_policy_id', 'protection_policy_id'),
+      op_param('size_total', 'body', 'size_total', 'size_total'),
+      op_param('smb_notify_on_change_dir_depth', 'body', 'smb_notify_on_change_dir_depth', 'smb_notify_on_change_dir_depth'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -309,20 +300,20 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation file_system_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation file_system_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -339,22 +330,22 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation file_system_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation file_system_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -371,16 +362,15 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/file_system/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           access_policy: item['access_policy'],
           access_policy_l10n: item['access_policy_l10n'],
           access_type: item['access_type'],
@@ -420,45 +410,37 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -472,9 +454,7 @@ class Puppet::Provider::PowerstoreFileSystem::PowerstoreFileSystem
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

@@ -4,10 +4,10 @@ require 'puppet/resource_api'
 Puppet::ResourceApi.register_type(
   name: 'powerstore_nfs_export',
   features: ['remote_resource'],
-
+  # rubocop:disable Lint/UnneededDisable
+  # rubocop:disable Layout/TrailingWhitespace
   desc: <<-EOS,
     NFS Exports use the NFS protocol to provide an access point for configured Linux/Unix hosts or IP subnets to access file_systems or file_snapshots.
-
   EOS
   attributes:   {
     ensure:      {

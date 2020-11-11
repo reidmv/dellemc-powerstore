@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
 class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -94,9 +89,8 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
     remote_system['remote_username'] = resource[:remote_username] unless resource[:remote_username].nil?
     remote_system['session_chap_mode'] = resource[:session_chap_mode] unless resource[:session_chap_mode].nil?
     remote_system['type'] = resource[:type] unless resource[:type].nil?
-    return remote_system
+    remote_system
   end
-
   def build_update_hash(resource)
     remote_system = {}
     remote_system['data_network_latency'] = resource[:data_network_latency] unless resource[:data_network_latency].nil?
@@ -105,13 +99,14 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
     remote_system['name'] = resource[:name] unless resource[:name].nil?
     remote_system['remote_password'] = resource[:remote_password] unless resource[:remote_password].nil?
     remote_system['remote_username'] = resource[:remote_username] unless resource[:remote_username].nil?
-    return remote_system
+    remote_system
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     remote_system = {}
-    return remote_system
+    remote_system
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     remote_system = {}
@@ -138,12 +133,11 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
     remote_system['type'] = resource[:type] unless resource[:type].nil?
     remote_system['type_l10n'] = resource[:type_l10n] unless resource[:type_l10n].nil?
     remote_system['user_name'] = resource[:user_name] unless resource[:user_name].nil?
-    return remote_system
+    remote_system
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -151,26 +145,23 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation remote_system_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation remote_system_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -188,30 +179,30 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation remote_system_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation remote_system_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('data_network_latency', 'body', 'data_network_latency', 'data_network_latency'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('discovery_chap_mode', 'body', 'discovery_chap_mode', 'discovery_chap_mode'),
-      self.op_param('import_chap_info', 'body', 'import_chap_info', 'import_chap_info'),
-      self.op_param('iscsi_addresses', 'body', 'iscsi_addresses', 'iscsi_addresses'),
-      self.op_param('management_address', 'body', 'management_address', 'management_address'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('remote_password', 'body', 'remote_password', 'remote_password'),
-      self.op_param('remote_username', 'body', 'remote_username', 'remote_username'),
-      self.op_param('session_chap_mode', 'body', 'session_chap_mode', 'session_chap_mode'),
-      self.op_param('type', 'body', 'type', 'type'),
+      op_param('data_network_latency', 'body', 'data_network_latency', 'data_network_latency'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('discovery_chap_mode', 'body', 'discovery_chap_mode', 'discovery_chap_mode'),
+      op_param('import_chap_info', 'body', 'import_chap_info', 'import_chap_info'),
+      op_param('iscsi_addresses', 'body', 'iscsi_addresses', 'iscsi_addresses'),
+      op_param('management_address', 'body', 'management_address', 'management_address'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('remote_password', 'body', 'remote_password', 'remote_password'),
+      op_param('remote_username', 'body', 'remote_username', 'remote_username'),
+      op_param('session_chap_mode', 'body', 'session_chap_mode', 'session_chap_mode'),
+      op_param('type', 'body', 'type', 'type'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -228,26 +219,26 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation remote_system_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation remote_system_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('data_network_latency', 'body', 'data_network_latency', 'data_network_latency'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('management_address', 'body', 'management_address', 'management_address'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('remote_password', 'body', 'remote_password', 'remote_password'),
-      self.op_param('remote_username', 'body', 'remote_username', 'remote_username'),
+      op_param('data_network_latency', 'body', 'data_network_latency', 'data_network_latency'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('management_address', 'body', 'management_address', 'management_address'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('remote_password', 'body', 'remote_password', 'remote_password'),
+      op_param('remote_username', 'body', 'remote_username', 'remote_username'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -264,20 +255,20 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation remote_system_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation remote_system_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -294,22 +285,22 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation remote_system_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation remote_system_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -326,16 +317,15 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/remote_system/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           data_connection_state: item['data_connection_state'],
           data_connection_state_l10n: item['data_connection_state_l10n'],
           data_connections: item['data_connections'],
@@ -362,45 +352,37 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -414,9 +396,7 @@ class Puppet::Provider::PowerstoreRemoteSystem::PowerstoreRemoteSystem
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

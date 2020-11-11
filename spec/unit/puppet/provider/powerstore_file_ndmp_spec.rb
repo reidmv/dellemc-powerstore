@@ -18,22 +18,6 @@ RSpec.describe Puppet::Provider::PowerstoreFileNdmp::PowerstoreFileNdmp do
     allow(transport).to receive(:call_op).and_return(response)
   end
 
-  # describe '#get' do
-  #   it 'processes resources' do
-  #     expect(context).to receive(:debug).with('Returning pre-canned example data')
-  #     expect(provider.get(context)).to eq [
-  #       {
-  #         name: 'foo',
-  #         ensure: 'present',
-  #       },
-  #       {
-  #         name: 'bar',
-  #         ensure: 'present',
-  #       },
-  #     ]
-  #   end
-  # end
-
   describe 'create(context, name, should)' do
     it 'creates the resource' do
       allow(context).to receive(:creating).with('bar').and_yield
@@ -42,9 +26,8 @@ RSpec.describe Puppet::Provider::PowerstoreFileNdmp::PowerstoreFileNdmp do
       provider.create(context, 'bar', name: 'bar', ensure: 'present')
     end
   end
-
   describe 'update(context, name, should)' do
-    it 'updates the resource' do
+    it 'update the resource' do
       allow(context).to receive(:updating).with('foo').and_yield
       expect(transport).to receive(:call_op).with(any_args, 'Patch', anything)
 
@@ -52,9 +35,8 @@ RSpec.describe Puppet::Provider::PowerstoreFileNdmp::PowerstoreFileNdmp do
     end
   end
 
-
   describe 'delete(context, should)' do
-    it 'deletes the resource' do
+    it 'delete the resource' do
       expect(transport).to receive(:call_op).with(any_args, 'Delete', anything)
 
       provider.delete(context, name: 'foo')

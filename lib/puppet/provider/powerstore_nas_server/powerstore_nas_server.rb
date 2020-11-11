@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
 class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -90,9 +85,8 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
     nas_server['is_auto_user_mapping_enabled'] = resource[:is_auto_user_mapping_enabled] unless resource[:is_auto_user_mapping_enabled].nil?
     nas_server['is_username_translation_enabled'] = resource[:is_username_translation_enabled] unless resource[:is_username_translation_enabled].nil?
     nas_server['name'] = resource[:name] unless resource[:name].nil?
-    return nas_server
+    nas_server
   end
-
   def build_update_hash(resource)
     nas_server = {}
     nas_server['backup_IPv4_interface_id'] = resource[:backup_i_pv4_interface_id] unless resource[:backup_i_pv4_interface_id].nil?
@@ -108,15 +102,14 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
     nas_server['preferred_node_id'] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
     nas_server['production_IPv4_interface_id'] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
     nas_server['production_IPv6_interface_id'] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
-    return nas_server
+    nas_server
   end
-
   def build_delete_hash(resource)
     nas_server = {}
     nas_server['domain_password'] = resource[:domain_password] unless resource[:domain_password].nil?
     nas_server['domain_user_name'] = resource[:domain_user_name] unless resource[:domain_user_name].nil?
     nas_server['is_skip_domain_unjoin'] = resource[:is_skip_domain_unjoin] unless resource[:is_skip_domain_unjoin].nil?
-    return nas_server
+    nas_server
   end
 
   def build_hash(resource)
@@ -143,12 +136,11 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
     nas_server['preferred_node_id'] = resource[:preferred_node_id] unless resource[:preferred_node_id].nil?
     nas_server['production_IPv4_interface_id'] = resource[:production_i_pv4_interface_id] unless resource[:production_i_pv4_interface_id].nil?
     nas_server['production_IPv6_interface_id'] = resource[:production_i_pv6_interface_id] unless resource[:production_i_pv6_interface_id].nil?
-    return nas_server
+    nas_server
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -156,26 +148,23 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nas_server_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation nas_server_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -193,26 +182,26 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nas_server_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation nas_server_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('current_unix_directory_service', 'body', 'current_unix_directory_service', 'current_unix_directory_service'),
-      self.op_param('default_unix_user', 'body', 'default_unix_user', 'default_unix_user'),
-      self.op_param('default_windows_user', 'body', 'default_windows_user', 'default_windows_user'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('is_auto_user_mapping_enabled', 'body', 'is_auto_user_mapping_enabled', 'is_auto_user_mapping_enabled'),
-      self.op_param('is_username_translation_enabled', 'body', 'is_username_translation_enabled', 'is_username_translation_enabled'),
-      self.op_param('name', 'body', 'name', 'name'),
+      op_param('current_unix_directory_service', 'body', 'current_unix_directory_service', 'current_unix_directory_service'),
+      op_param('default_unix_user', 'body', 'default_unix_user', 'default_unix_user'),
+      op_param('default_windows_user', 'body', 'default_windows_user', 'default_windows_user'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('is_auto_user_mapping_enabled', 'body', 'is_auto_user_mapping_enabled', 'is_auto_user_mapping_enabled'),
+      op_param('is_username_translation_enabled', 'body', 'is_username_translation_enabled', 'is_username_translation_enabled'),
+      op_param('name', 'body', 'name', 'name'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -229,33 +218,33 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nas_server_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation nas_server_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('backup_IPv4_interface_id', 'body', 'backup_i_pv4_interface_id', 'backup_i_pv4_interface_id'),
-      self.op_param('backup_IPv6_interface_id', 'body', 'backup_i_pv6_interface_id', 'backup_i_pv6_interface_id'),
-      self.op_param('current_node_id', 'body', 'current_node_id', 'current_node_id'),
-      self.op_param('current_unix_directory_service', 'body', 'current_unix_directory_service', 'current_unix_directory_service'),
-      self.op_param('default_unix_user', 'body', 'default_unix_user', 'default_unix_user'),
-      self.op_param('default_windows_user', 'body', 'default_windows_user', 'default_windows_user'),
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_auto_user_mapping_enabled', 'body', 'is_auto_user_mapping_enabled', 'is_auto_user_mapping_enabled'),
-      self.op_param('is_username_translation_enabled', 'body', 'is_username_translation_enabled', 'is_username_translation_enabled'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('preferred_node_id', 'body', 'preferred_node_id', 'preferred_node_id'),
-      self.op_param('production_IPv4_interface_id', 'body', 'production_i_pv4_interface_id', 'production_i_pv4_interface_id'),
-      self.op_param('production_IPv6_interface_id', 'body', 'production_i_pv6_interface_id', 'production_i_pv6_interface_id'),
+      op_param('backup_IPv4_interface_id', 'body', 'backup_i_pv4_interface_id', 'backup_i_pv4_interface_id'),
+      op_param('backup_IPv6_interface_id', 'body', 'backup_i_pv6_interface_id', 'backup_i_pv6_interface_id'),
+      op_param('current_node_id', 'body', 'current_node_id', 'current_node_id'),
+      op_param('current_unix_directory_service', 'body', 'current_unix_directory_service', 'current_unix_directory_service'),
+      op_param('default_unix_user', 'body', 'default_unix_user', 'default_unix_user'),
+      op_param('default_windows_user', 'body', 'default_windows_user', 'default_windows_user'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_auto_user_mapping_enabled', 'body', 'is_auto_user_mapping_enabled', 'is_auto_user_mapping_enabled'),
+      op_param('is_username_translation_enabled', 'body', 'is_username_translation_enabled', 'is_username_translation_enabled'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('preferred_node_id', 'body', 'preferred_node_id', 'preferred_node_id'),
+      op_param('production_IPv4_interface_id', 'body', 'production_i_pv4_interface_id', 'production_i_pv4_interface_id'),
+      op_param('production_IPv6_interface_id', 'body', 'production_i_pv6_interface_id', 'production_i_pv6_interface_id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -272,23 +261,23 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nas_server_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation nas_server_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('domain_password', 'body', 'domain_password', 'domain_password'),
-      self.op_param('domain_user_name', 'body', 'domain_user_name', 'domain_user_name'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_skip_domain_unjoin', 'body', 'is_skip_domain_unjoin', 'is_skip_domain_unjoin'),
+      op_param('domain_password', 'body', 'domain_password', 'domain_password'),
+      op_param('domain_user_name', 'body', 'domain_user_name', 'domain_user_name'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_skip_domain_unjoin', 'body', 'is_skip_domain_unjoin', 'is_skip_domain_unjoin'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -305,22 +294,22 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation nas_server_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation nas_server_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -337,16 +326,15 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/nas_server/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           backup_i_pv4_interface_id: item['backup_IPv4_interface_id'],
           backup_i_pv6_interface_id: item['backup_IPv6_interface_id'],
           current_node_id: item['current_node_id'],
@@ -372,45 +360,37 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -424,9 +404,7 @@ class Puppet::Provider::PowerstoreNasServer::PowerstoreNasServer
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)

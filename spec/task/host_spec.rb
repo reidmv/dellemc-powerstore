@@ -17,25 +17,30 @@ describe 'powerstore_host' do
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs host_instance_query' do
     result = run_task('powerstore::host_instance_query', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
     expect(result[0]['value']).not_to be_nil
   end
+
   it 'performs host_delete' do
     result = run_task('powerstore::host_delete', 'sut', { 'id' => 'string' }, config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
+
   it 'performs host_create' do
     result = run_task('powerstore::host_create', 'sut', sample_task_parameters('host_create'), config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
+
   it 'performs host_attach' do
     result = run_task('powerstore::host_attach', 'sut', sample_task_parameters('host_attach'), config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
+
   it 'performs host_detach' do
     result = run_task('powerstore::host_detach', 'sut', sample_task_parameters('host_detach'), config: config_data, inventory: inventory_data)
     expect(result[0]['status']).to eq('success')
   end
-  end
+end

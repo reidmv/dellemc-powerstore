@@ -1,6 +1,8 @@
 require 'puppet/resource_api'
-require "pry"
 
+# rubocop:disable Layout/EmptyLinesAroundClassBody
+
+# class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
 class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
   def canonicalize(_context, resources)
     # nout to do here but seems we need to implement it
@@ -8,15 +10,14 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
   end
 
   def get(context)
-    context.debug("Entered get")
+    context.debug('Entered get')
     hash = self.class.fetch_all_as_hash(context)
     context.debug("Completed get, returning hash #{hash}")
     hash
-
   end
 
   def set(context, changes, noop: false)
-    context.debug("Entered set")
+    context.debug('Entered set')
 
     changes.each do |name, change|
       context.debug("set change with #{name} and #{change}")
@@ -51,14 +52,11 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
       new_hash.delete('id')
       response = self.class.invoke_create(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Create failed.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Create failed.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during create. The state of the resource is unknown.  ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -69,14 +67,11 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
       new_hash.delete('id')
       response = self.class.invoke_update(context, should, new_hash)
 
-      if response.is_a? Net::HTTPSuccess
-        should[:ensure] = 'present'
-        Puppet.info('Added :ensure to property hash')
-      else
-        raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-      end
+      raise("Update failed. The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+      should[:ensure] = 'present'
+      Puppet.info('Added :ensure to property hash')
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("Exception during update. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
@@ -93,9 +88,8 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
     smb_share['offline_availability'] = resource[:offline_availability] unless resource[:offline_availability].nil?
     smb_share['path'] = resource[:path] unless resource[:path].nil?
     smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
-    return smb_share
+    smb_share
   end
-
   def build_update_hash(resource)
     smb_share = {}
     smb_share['description'] = resource[:description] unless resource[:description].nil?
@@ -105,13 +99,14 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
     smb_share['is_encryption_enabled'] = resource[:is_encryption_enabled] unless resource[:is_encryption_enabled].nil?
     smb_share['offline_availability'] = resource[:offline_availability] unless resource[:offline_availability].nil?
     smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
-    return smb_share
+    smb_share
   end
-
+  # rubocop:disable Lint/UnusedMethodArgument
   def build_delete_hash(resource)
     smb_share = {}
-    return smb_share
+    smb_share
   end
+  # rubocop:enable Lint/UnusedMethodArgument
 
   def build_hash(resource)
     smb_share = {}
@@ -127,12 +122,11 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
     smb_share['offline_availability_l10n'] = resource[:offline_availability_l10n] unless resource[:offline_availability_l10n].nil?
     smb_share['path'] = resource[:path] unless resource[:path].nil?
     smb_share['umask'] = resource[:umask] unless resource[:umask].nil?
-    return smb_share
+    smb_share
   end
 
   def self.build_key_values
     key_values = {}
-    
     key_values['api-version'] = 'assets'
     key_values
   end
@@ -140,26 +134,23 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
   def delete(context, should)
     new_hash = build_delete_hash(should)
     response = self.class.invoke_delete(context, should, new_hash)
-    if response.is_a? Net::HTTPSuccess
-      should[:ensure] = 'absent'
-      Puppet.info "Added 'absent' to property_hash"
-    else
-      raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}")
-    end
-  rescue Exception => ex
+    raise("Delete failed.  The state of the resource is unknown.  Response is #{response} and body is #{response.body}") unless response.is_a? Net::HTTPSuccess
+    should[:ensure] = 'absent'
+    Puppet.info "Added 'absent' to property_hash"
+  rescue StandardError => ex
     Puppet.alert("Exception during destroy. ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
 
   def self.invoke_list_all(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation smb_share_collection_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation smb_share_collection_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
     ]
     op_params.each do |i|
@@ -177,29 +168,29 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share', 'Get', 'application/json')
   end
 
 
   def self.invoke_create(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation smb_share_create")
+    key_values = build_key_values
+    Puppet.info('Calling operation smb_share_create')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('file_system_id', 'body', 'file_system_id', 'file_system_id'),
-      self.op_param('is_ABE_enabled', 'body', 'is_abe_enabled', 'is_abe_enabled'),
-      self.op_param('is_branch_cache_enabled', 'body', 'is_branch_cache_enabled', 'is_branch_cache_enabled'),
-      self.op_param('is_continuous_availability_enabled', 'body', 'is_continuous_availability_enabled', 'is_continuous_availability_enabled'),
-      self.op_param('is_encryption_enabled', 'body', 'is_encryption_enabled', 'is_encryption_enabled'),
-      self.op_param('name', 'body', 'name', 'name'),
-      self.op_param('offline_availability', 'body', 'offline_availability', 'offline_availability'),
-      self.op_param('path', 'body', 'path', 'path'),
-      self.op_param('umask', 'body', 'umask', 'umask'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('file_system_id', 'body', 'file_system_id', 'file_system_id'),
+      op_param('is_ABE_enabled', 'body', 'is_abe_enabled', 'is_abe_enabled'),
+      op_param('is_branch_cache_enabled', 'body', 'is_branch_cache_enabled', 'is_branch_cache_enabled'),
+      op_param('is_continuous_availability_enabled', 'body', 'is_continuous_availability_enabled', 'is_continuous_availability_enabled'),
+      op_param('is_encryption_enabled', 'body', 'is_encryption_enabled', 'is_encryption_enabled'),
+      op_param('name', 'body', 'name', 'name'),
+      op_param('offline_availability', 'body', 'offline_availability', 'offline_availability'),
+      op_param('path', 'body', 'path', 'path'),
+      op_param('umask', 'body', 'umask', 'umask'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -216,27 +207,27 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share', 'Post','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share', 'Post', 'application/json')
   end
 
 
   def self.invoke_update(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation smb_share_modify")
+    key_values = build_key_values
+    Puppet.info('Calling operation smb_share_modify')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('description', 'body', 'description', 'description'),
-      self.op_param('id', 'path', 'id', 'id'),
-      self.op_param('is_ABE_enabled', 'body', 'is_abe_enabled', 'is_abe_enabled'),
-      self.op_param('is_branch_cache_enabled', 'body', 'is_branch_cache_enabled', 'is_branch_cache_enabled'),
-      self.op_param('is_continuous_availability_enabled', 'body', 'is_continuous_availability_enabled', 'is_continuous_availability_enabled'),
-      self.op_param('is_encryption_enabled', 'body', 'is_encryption_enabled', 'is_encryption_enabled'),
-      self.op_param('offline_availability', 'body', 'offline_availability', 'offline_availability'),
-      self.op_param('umask', 'body', 'umask', 'umask'),
+      op_param('description', 'body', 'description', 'description'),
+      op_param('id', 'path', 'id', 'id'),
+      op_param('is_ABE_enabled', 'body', 'is_abe_enabled', 'is_abe_enabled'),
+      op_param('is_branch_cache_enabled', 'body', 'is_branch_cache_enabled', 'is_branch_cache_enabled'),
+      op_param('is_continuous_availability_enabled', 'body', 'is_continuous_availability_enabled', 'is_continuous_availability_enabled'),
+      op_param('is_encryption_enabled', 'body', 'is_encryption_enabled', 'is_encryption_enabled'),
+      op_param('offline_availability', 'body', 'offline_availability', 'offline_availability'),
+      op_param('umask', 'body', 'umask', 'umask'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -253,20 +244,20 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Patch','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Patch', 'application/json')
   end
 
 
   def self.invoke_delete(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation smb_share_delete")
+    key_values = build_key_values
+    Puppet.info('Calling operation smb_share_delete')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -283,22 +274,22 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Delete','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Delete', 'application/json')
   end
 
 
 
 
   def self.invoke_get_one(context, resource = nil, body_params = nil)
-    key_values = self.build_key_values
-    Puppet.info("Calling operation smb_share_instance_query")
+    key_values = build_key_values
+    Puppet.info('Calling operation smb_share_instance_query')
     path_params = {}
     query_params = {}
     header_params = {}
-    header_params["User-Agent"] = ""
-    
+    header_params['User-Agent'] = ''
+
     op_params = [
-      self.op_param('id', 'path', 'id', 'id'),
+      op_param('id', 'path', 'id', 'id'),
     ]
     op_params.each do |i|
       inquery = i[:inquery]
@@ -315,16 +306,15 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
         path_params[name_snake.to_sym] = resource[paramalias.to_sym] unless resource.nil? || resource[paramalias.to_sym].nil?
       end
     end
-    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Get','application/json')
+    context.transport.call_op(path_params, query_params, header_params, body_params, '/smb_share/%{id}', 'Get', 'application/json')
   end
 
 
   def self.fetch_all_as_hash(context)
-    items = self.fetch_all(context)
+    items = fetch_all(context)
     if items
-      items.collect do |item|
+      items.map { |item|
         hash = {
-
           description: item['description'],
           file_system_id: item['file_system_id'],
           id: item['id'],
@@ -340,45 +330,37 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
           ensure: 'present',
         }
         Puppet.debug("Adding to collection: #{item}")
-
         hash
-
-      end.compact
+      }.compact
     else
       []
     end
-  rescue Exception => ex
+  rescue StandardError => ex
     Puppet.alert("ex is #{ex} and backtrace is #{ex.backtrace}")
     raise
   end
 
   def self.deep_delete(hash_item, tokens)
     if tokens.size == 1
-      if hash_item.kind_of?(Array)
+      if hash_item.is_a?(Array)
         hash_item.map! { |item| deep_delete(item, tokens) }
       else
-        hash_item.delete(tokens[0]) unless hash_item.nil? or hash_item[tokens[0]].nil?
+        hash_item.delete(tokens[0]) unless hash_item.nil? || hash_item[tokens[0]].nil?
       end
+    elsif hash_item.is_a?(Array)
+      hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
     else
-      if hash_item.kind_of?(Array)
-        hash_item.map! { |item| deep_delete(item, tokens[1..-1]) }
-      else
-        hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? or hash_item[tokens[0]].nil?
-      end
+      hash_item[tokens.first] = deep_delete(hash_item[tokens.first], tokens[1..-1]) unless hash_item.nil? || hash_item[tokens[0]].nil?
     end
-    return hash_item
+    hash_item
   end
 
   def self.fetch_all(context)
     response = invoke_list_all(context)
-    if response.kind_of? Net::HTTPSuccess
-      body = JSON.parse(response.body)
-      if body.is_a? Array # and body.key? "value"
-        return body #["value"]
-      end
-    end
+    return unless response.is_a? Net::HTTPSuccess
+    body = JSON.parse(response.body)
+    body # ["value"] if body.is_a? Array # and body.key? "value"
   end
-
 
   def self.authenticate(_path_params, _query_params, _header_params, _body_params)
     true
@@ -392,9 +374,7 @@ class Puppet::Provider::PowerstoreSmbShare::PowerstoreSmbShare
   end
 
   def self.add_keys_to_request(request, hash)
-    if hash
-      hash.each { |x, v| request[x] = v }
-    end
+    hash.each { |x, v| request[x] = v } if hash
   end
 
   def self.to_query(hash)
