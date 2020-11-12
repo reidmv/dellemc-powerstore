@@ -10,7 +10,7 @@ steps:
     description: Get all volume groups
     targets: $targets
     parameters:
-      query_string: select=name,volumes
+      query_string: select=name,volumes&type=neq.Snapshot
 
 return: $volume_groups.first.value.filter |$k, $v| { $v['volumes'].empty }
                                   .map |$k, $v| { $v['name'] }
