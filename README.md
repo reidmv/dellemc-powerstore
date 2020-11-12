@@ -13,6 +13,8 @@
     - [Using Tasks](#using-tasks)
       - [Introduction to PowerStore tasks](#introduction-to-powerstore-tasks)
       - [Examples](#examples)
+    - [Using Plans](#using-plans)
+    - [Using Idempotent Puppet Resource Types](#using-idempotent-puppet-resource-types)
   - [Reference](#reference)
   - [Limitations](#limitations)
   - [Development](#development)
@@ -62,8 +64,7 @@ The `dellemc-powerstore` Puppet module allows you to configure and deploy the Po
    ```yaml
     version: 2
     targets:
-    - uri: 127.0.0.1
-      name: my_array
+    - name: my_array
       config:
         transport: remote
         remote:
@@ -71,25 +72,55 @@ The `dellemc-powerstore` Puppet module allows you to configure and deploy the Po
           user: admin
           password: My$ecret!
           remote-transport: powerstore
-   ``` 
+   ```
+
 ## Usage
 
 ### Using Tasks
 
 #### Introduction to PowerStore tasks
 
-Every PowerStore API endpoint has a corresponding task. For example, for manilupating PowerStore volumes, the following tasks are available:
+Every PowerStore API endpoint has a corresponding task. For example, for manipulating PowerStore volumes, the following tasks are available:
+- volume_collection_query
+- volume_instance_query
 - volume_attach
 - volume_clone
-- volume_collection_query
 - volume_create
 - volume_delete
 - volume_detach
-- volume_instance_query
 - volume_modify
 - volume_refresh
 - volume_restore
 - volume_snapshot
+
+Task usage is displayed by running `bolt task show`, for example:
+
+```
+bolt task show powerstore::volume_attach
+
+powerstore::volume_attach - Attach a volume to a host or host group.
+
+USAGE:
+bolt task run --targets <node-name> powerstore::volume_attach host_group_id=<value> host_id=<value> id=<value> logical_unit_number=<value>
+
+PARAMETERS:
+- host_group_id: Optional[String]
+    Unique identifier of the host group to be attached to the volume. Only one of host_id or host_group_id can be supplied.
+- host_id: Optional[String]
+    Unique identifier of the host to be attached to the volume. Only one of host_id or host_group_id can be supplied.
+- id: String
+    Unique identifier of volume to attach.
+- logical_unit_number: Optional[Integer[0,16383]]
+    Logical unit number for the host volume access.
+```
+
+The --targets parameter is the name of the device as configured in the inventory file (see above).
+
+Every parameter is displayed along with its data type. Optional parameters have a type starting with the word `Optional`. So in the above example, the task accepts 3 parameters:
+- `host_group_id`: optional String parameter
+- `host_id`: optional String parameter
+- `id`: required String parameter
+- `logical_unit_number`: optional parameter, should be an Integer between 0 and 16383.
 
 #### Examples
 
@@ -111,133 +142,100 @@ Every PowerStore API endpoint has a corresponding task. For example, for manilup
   bolt task run powerstore::volume_create name="small_volume" size=1048576 description="Small Volume" -t my_array
   ```
 
-* Define a managed Unity system
+### Using Plans
 
-```puppet
-unity_system { 'FNM12345678901':
-  ip       => '192.168.1.50',
-  user     => 'admin',
-  password => 'password',
-  ensure => present,
-}
+Puppet Plans are higher-level workflows which can leverage logic, tasks and commands to perform orchestrated operations on managed devices. Puppet Plans can be written using YAML or Puppet language. Example plans can be found in the [plans](plans) directory and are documented [here](REFERENCE.md#plans).
+
+For displaying usage information for a plan, run `bolt plan show`. for example:
+```
+> bolt plan show powerstore::capacity_volumes
+
+powerstore::capacity_volumes - list volumes with more than given capacity
+
+USAGE:
+bolt plan run powerstore::capacity_volumes threshold=<value> targets=<value>
+
+PARAMETERS:
+- threshold: Variant[Numeric,String]
+    Volume capacity needed (in bytes or MB/GB/TB)
+- targets: TargetSpec
 ```
 
-The defined system `Unity_system['FNM12345678901']` then can be passed to any Unity resources.
+Example of running the plan:
 
-
-* Upload a license
-
-```puppet
-unity_license { '/path/to/the/license.lic':
-  unity_system => Unity_system['FNM12345678901'],
-  ensure => present,
-}
+```
+> bolt plan run powerstore::capacity_volumes -t pws3k threshold=220G
+Starting: plan powerstore::capacity_volumes
+Starting: task powerstore::volume_collection_query on my_array
+Finished: task powerstore::volume_collection_query with 0 failures in 1.64 sec
++----------------------+-----------------+------------+
+|        List of volumes with capacity > 220G         |
++----------------------+-----------------+------------+
+| volume name          | capacity        | MB         |
++----------------------+-----------------+------------+
+| Volume1              |  43980465111040 |   43.98 TB |
+| my_large_volume      |    595926712320 |  595.93 GB |
+| my_terabyte_volume   |   1099511627776 |    1.10 TB |
++----------------------+-----------------+------------+
+Finished: plan powerstore::capacity_volumes in 1.94 sec
+Plan completed successfully with no result
 ```
 
-Note: the path separator in the `title` must be `/` even using on Windows agent.
-* Create a pool
+### Using Idempotent Puppet Resource Types
 
-```puppet
-unity_pool { 'puppet_pool':
-  unity_system => Unity_system['FNM12345678901'],
-  description => 'created by puppet module',
-  raid_groups => [{
-    disk_group => 'dg_15',
-    raid_type => 1,
-    stripe_width => 0,
-    disk_num => 5,
-  }],
-  ensure => present,
-}
-```
+Tasks are an imperative way to query or manipulate state. In addition, the `powerstore` module offers Puppet types which offer an idempotent way of managing the devices's desired state.
 
-* Create a iSCSI portal on ethernet port
+Example of managing a volume called `my_volume` and ensuring it is created if it does not exist:
 
-```puppet
-unity_iscsi_portal { '10.244.213.245':
-  unity_system  => Unity_system['FNM12345678901'],
-  ethernet_port => 'spa_eth3',
-  netmask       => '255.255.255.0',
-  vlan          => 133,
-  gateway       => '10.244.213.1',
-  ensure        => present,
-}
-```
+1. Example using YAML-language plan:
+    ```yaml
+        resources:
+          - powerstore_volume: my_volume
+            parameters:
+              size: 26843545600
+              description: My 25G Volume
+              ensure: present
+    ```
+1. Example using a Puppet-language plan:
+    ```puppet
+          powerstore_volume { 'my_volume':
+            ensure      => present,
+            size        => 26843545600,
+            description => 'My 25G Volume',
+          }
+    ```
 
-* Create a Host
+See the [create_volume.pp](plans/create_volume.pp) and [create_volume_yaml.yaml](plans/create_volume_yaml.yaml) example plans showing a parametrized version of the above.
 
-```puppet
-unity_host { 'my_host':
-  unity_system => Unity_system['FNM12345678901'],
-  description  => 'Created by puppet',
-  ip           => '192.168.1.139',
-  os           => 'Ubuntu16',
-  host_type    => 1,
-  iqn          => 'iqn.1993-08.org.debian:01:unity-puppet-host',
-  wwns         => ['20:00:00:90:FA:53:4C:D1:10:00:00:90:FA:53:4C:D3',
-     '20:00:00:90:FA:53:4C:D1:10:00:00:90:FA:53:4C:D4'],
-  ensure       => present,
-}
-```
-
-* Create a io limit policy
-
-```puppet
-# Create a Unity io limit policy (absolute limit)
-unity_io_limit_policy { 'puppet_policy':
-  unity_system => Unity_system['FNM12345678901'],
-  policy_type => 1,
-  description => 'Created by puppet 12',
-  max_iops => 1000,
-  max_kbps => 20480,
-  burst_rate => 50,
-  burst_time => 10,
-  burst_frequency => 2,
-}
-```
-
-The meaning for above burst settings is: **50% for 10 minute(s) resetting every 2 hour(s)**.
-
-* Create a LUN
-
-```puppet
-unity_lun { 'puppet_lun':
-  unity_system    => Unity_system['FNM12345678901'],
-  pool            => Unity_pool['puppet_pool'],
-  size            => 15,
-  thin            => true,
-  compression     => false,
-  sp              => 0,
-  description     => "Created by puppet_unity.",
-  io_limit_policy => Unity_io_limit_policy['puppet_policy'],
-  hosts           => [Unity_host['my_host']],
-  ensure          => present,
-}
-```
-
-* Define multiple Unity system in manifest file
-
-Administrator can define multiple systems and manage the resources on systems via a single manifest file.
-
-Please refer to the example file here: [example_multiple_systems](examples/example_multiple_systems.pp)
-
+See the reference documentation for a list of all available [Resource types](REFERENCE.md#resource-types).
 
 ## Reference
 
 Please see [REFERENCE](REFERENCE.md) for detailed information on available resource types, tasks and plans.
 
+Direct links to the various parts of the reference documentation:
+
+1. [Plans](REFERENCE.md#plans)
+1. [Tasks](REFERENCE.md#tasks)
+1. [Resource types](REFERENCE.md#resource-types)
+1. [Functions](REFERENCE.md#functions)
+
 ## Limitations
 
+... forthcoming ...
 
 ## Development
 
-Simply fork the repo and send PR for your code change(also provide testing result of your change), remember to give a title and description of your PR.
+... forthcoming ...
 
 ## Contributors
 
+
 ## Contact
+
+... forthcoming ...
 
 ## Release Notes
 
 - 0.1.0
-    * Initial release.
+  * Initial release
