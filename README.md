@@ -18,6 +18,11 @@
   - [Reference](#reference)
   - [Limitations](#limitations)
   - [Development](#development)
+    - [Installing PDK](#installing-pdk)
+    - [Running unit tests](#running-unit-tests)
+    - [Setting up the prism mock API server](#setting-up-the-prism-mock-api-server)
+    - [Running type/provider acceptance tests](#running-typeprovider-acceptance-tests)
+    - [Running task acceptance tests](#running-task-acceptance-tests)
   - [Contributors](#contributors)
   - [Contact](#contact)
   - [Release Notes](#release-notes)
@@ -226,10 +231,145 @@ Direct links to the various parts of the reference documentation:
 
 ## Development
 
-... forthcoming ...
+### Installing PDK
+
+To run unit and acceptance tests, you need to first [install the Puppet Development Kit, or PDK](https://puppet.com/docs/pdk/1.x/pdk_install.html).
+
+### Running unit tests
+
+To run unit tests, `cd` to the module directory and run:
+```bash
+> pdk test unit
+```
+
+You should expect to see something like this - the most important thing is that you should have 0 failures:
+```bash
+pdk (INFO): Using Ruby 2.5.8
+pdk (INFO): Using Puppet 6.17.0
+[✔] Preparing to run the unit tests.
+......................................................................................................................
+
+Finished in 2.25 seconds (files took 5.17 seconds to load)
+118 examples, 0 failures
+```
+
+### Setting up the prism mock API server
+
+The current acceptance test suite assumes that the `prism` API server is up and running.
+Although in theory it is possible to run acceptance tests against a real device, that is much harder to automate because of unknown `id`s of existing resources.
+
+1. Install prism by following [the documentation](https://meta.stoplight.io/docs/prism/docs/getting-started/01-installation.md)
+1. Make sure you have a copy of the PowerStore OpenAPI json file, let's call it `powerstore.json`
+1. Remove all cyclical dependencies from the OpenAPI json file since `prism` does not support cycles inside OpenAPI specifications, producing the file `powerstore-nocycles.json`
+1. Start the mock API server:
+   ```bash
+   prism mock powerstore-nocycles.json
+   ```
+   You will see something like:
+   ```
+   [5:43:55 PM] › [CLI] …  awaiting  Starting Prism…
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/appliance
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/appliance/vel
+   [5:43:56 PM] › [CLI] ℹ  info      PATCH      http://127.0.0.1:4010/appliance/maiores
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/node
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/node/ut
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/network
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/network/dolor
+   [5:43:56 PM] › [CLI] ℹ  info      PATCH      http://127.0.0.1:4010/network/placeat
+   [5:43:56 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/network/adipisci/replace
+   [5:43:56 PM] › [CLI] ℹ  info      POST       http://127.0.0.1:4010/network/nam/scale
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/ip_pool_address
+   [5:43:56 PM] › [CLI] ℹ  info      GET        http://127.0.0.1:4010/ip_pool_address/pariatur
+   ...
+   ```
+
+    The prism mock API server is now up and running on the default port 4010.
+
+### Running type/provider acceptance tests
+
+```bash
+> MOCK_ACCEPTANCE=true pdk bundle rspec spec/acceptance
+```
+The test output will be something like this:
+```
+pdk (INFO): Using Ruby 2.5.8
+pdk (INFO): Using Puppet 6.17.0
+Running tests against this machine !
+Run options: exclude {:update=>true, :bolt=>true}
+
+powerstore_email_notify_destination
+  get powerstore_email_notify_destination
+  create powerstore_email_notify_destination
+  delete powerstore_email_notify_destination
+```
+and the prism log will show something like this:
+
+```
+[5:47:39 PM] › [HTTP SERVER] get /email_notify_destination ℹ  info      Request received
+[5:47:39 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:39 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[5:47:39 PM] › [HTTP SERVER] get /appliance ℹ  info      Request received
+[5:47:39 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:39 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[5:47:39 PM] › [HTTP SERVER] post /email_notify_destination ℹ  info      Request received
+[5:47:39 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:39 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:39 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 201
+[5:47:50 PM] › [HTTP SERVER] get /appliance ℹ  info      Request received
+[5:47:50 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:50 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[5:47:50 PM] › [HTTP SERVER] get /email_notify_destination ℹ  info      Request received
+[5:47:50 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:50 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[5:47:50 PM] › [HTTP SERVER] get /appliance ℹ  info      Request received
+[5:47:50 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:50 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 200
+[5:47:50 PM] › [HTTP SERVER] delete /email_notify_destination/string ℹ  info      Request received
+[5:47:50 PM] ›     [NEGOTIATOR] ℹ  info      Request contains an accept header: */*
+[5:47:50 PM] ›     [VALIDATOR] ✔  success   The request passed the validation rules. Looking for the best response
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Found a compatible content for */*
+[5:47:50 PM] ›     [NEGOTIATOR] ✔  success   Responding with the requested status code 204
+```
+
+The `get /appliance` request is done for authentication purposes.
+
+### Running task acceptance tests
+
+To execute all available acceptance tests for tasks, run the following:
+
+```
+> MOCK_ACCEPTANCE=true pdk bundle exec rspec spec/task
+pdk (INFO): Using Ruby 2.5.8
+pdk (INFO): Using Puppet 6.17.0
+Run options: exclude {:update=>true, :bolt=>true}
+
+powerstore_email_notify_destination
+  performs email_notify_destination_collection_query
+  performs email_notify_destination_instance_query
+  performs email_notify_destination_delete
+  performs email_notify_destination_create
+  performs email_notify_destination_test
+...
+```
+
+To run a subset of task tests, for example volume-related, do:
+```
+> MOCK_ACCEPTANCE=true pdk bundle exec rspec spec/task -e volume
+```
+
 
 ## Contributors
-
 
 ## Contact
 

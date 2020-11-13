@@ -103,6 +103,18 @@ module Puppet::Transport
         Puppet.debug("response code is #{response.code} and body is #{response.body}")
         success = response.is_a? Net::HTTPSuccess
         Puppet.info("Called (#{operation_verb}) endpoint at #{uri}, success was #{success}")
+        return response unless response.code == '206' # we received a partial response
+        body = []
+        loop do
+          body += JSON.parse(response.body)
+          m = response['content-range'].match %r{(?<from>\d+)-(?<to>\d+)/(?<total>\d+)}
+          range_to = m['to'].to_i
+          range_total = m['total'].to_i
+          break if range_to + 1 >= range_total
+          req['Range'] = "#{range_to+1}-#{range_to+2000}"
+          response = http.request req
+        end
+        response.body = body.to_json
         return response
       end
     end
