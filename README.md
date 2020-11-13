@@ -24,6 +24,7 @@
     - [Setting up the prism mock API server](#setting-up-the-prism-mock-api-server)
     - [Running type/provider acceptance tests](#running-typeprovider-acceptance-tests)
     - [Running task acceptance tests](#running-task-acceptance-tests)
+    - [Renerating REFERENCE.md](#renerating-referencemd)
   - [Contributors](#contributors)
   - [Contact](#contact)
   - [Release Notes](#release-notes)
@@ -383,6 +384,13 @@ To run a subset of task tests, for example volume-related, do:
 > MOCK_ACCEPTANCE=true pdk bundle exec rspec spec/task -e volume
 ```
 
+### Renerating REFERENCE.md
+
+To (re-)generate the REFERENCE.md file which documents the available types, tasks, functions and plans, run:
+
+```
+pdk bundle exec rake strings:generate:reference
+```
 
 ## Contributors
 
