@@ -111,7 +111,7 @@ module Puppet::Transport
           range_to = m['to'].to_i
           range_total = m['total'].to_i
           break if range_to + 1 >= range_total
-          req['Range'] = "#{range_to+1}-#{range_to+2000}"
+          req['Range'] = "#{range_to + 1}-#{range_to + 2000}"
           response = http.request req
         end
         response.body = body.to_json

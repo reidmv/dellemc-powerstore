@@ -20,6 +20,7 @@
   - [Development](#development)
     - [Installing PDK](#installing-pdk)
     - [Running unit tests](#running-unit-tests)
+    - [Running rubocop checks](#running-rubocop-checks)
     - [Setting up the prism mock API server](#setting-up-the-prism-mock-api-server)
     - [Running type/provider acceptance tests](#running-typeprovider-acceptance-tests)
     - [Running task acceptance tests](#running-task-acceptance-tests)
@@ -253,10 +254,24 @@ Finished in 2.25 seconds (files took 5.17 seconds to load)
 118 examples, 0 failures
 ```
 
+### Running rubocop checks
+
+```
+> pdk bundle exec rake rubocop
+pdk (INFO): Using Ruby 2.5.8
+pdk (INFO): Using Puppet 6.17.0
+Running RuboCop...
+Inspecting 573 files
+..................................................................................................................................................................................
+
+573 files inspected, no offenses detected
+```
+
 ### Setting up the prism mock API server
 
-The current acceptance test suite assumes that the `prism` API server is up and running.
-Although in theory it is possible to run acceptance tests against a real device, that is much harder to automate because of unknown `id`s of existing resources.
+The current acceptance test suite assumes that the `prism` API server is up and running. `prism` is a Open Source tool which can read an OpenAPI specification and generate a mock API server on the fly which is then able to validate incoming requests against the OpenAPI schemas and serve compliant responses with example data.
+
+Although - in theory - it is possible to run acceptance tests against a real device, that is much harder to automate because of unknown `id`s of existing resources.
 
 1. Install prism by following [the documentation](https://meta.stoplight.io/docs/prism/docs/getting-started/01-installation.md)
 1. Make sure you have a copy of the PowerStore OpenAPI json file, let's call it `powerstore.json`
