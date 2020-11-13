@@ -144,7 +144,7 @@ Every parameter is displayed along with its data type. Optional parameters have 
 
 ### Using Plans
 
-Puppet Plans are higher-level workflows which can leverage logic, tasks and commands to perform orchestrated operations on managed devices. Puppet Plans can be written using YAML or Puppet language. Example plans can be found in the [plans](plans) directory and are documented [here](REFERENCE.md#plans).
+Plans are higher-level workflows which can leverage logic, tasks and commands to perform orchestrated operations on managed devices. Puppet Plans can be written using YAML or Puppet language (see documentation on [writing Plans](https://puppet.com/docs/bolt/latest/plans.html)). Example `PowerStore` plans can be found in the [plans](plans) directory and are documented [here](REFERENCE.md#plans).
 
 For displaying usage information for a plan, run `bolt plan show`. for example:
 ```
