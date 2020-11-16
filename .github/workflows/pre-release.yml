@@ -9,10 +9,11 @@ on:
     - main
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@master
 
     - name: Set up Ruby 2.5
       uses: actions/setup-ruby@v1
