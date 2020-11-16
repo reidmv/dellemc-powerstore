@@ -39,17 +39,17 @@ plan powerstore::create_assign_protection_policy(
           'Saturday'
       ]
 
-      powerstore_snapshot_rule { 'high_frequency': 
+      powerstore_snapshot_rule { 'high_frequency':
         interval          => 'Five_Minutes',
         desired_retention => 24,
         days_of_week      => $a_week,
       }
-      powerstore_snapshot_rule { 'daily_roll_up': 
+      powerstore_snapshot_rule { 'daily_roll_up':
         interval          => 'One_Day',
         desired_retention => 168,
         days_of_week      => $a_week,
       }
-      powerstore_snapshot_rule { 'weekly_roll_up': 
+      powerstore_snapshot_rule { 'weekly_roll_up':
         time_of_day       => '03:00',
         desired_retention => 2160,
         days_of_week      => [ 'Saturday' ],
@@ -112,7 +112,7 @@ plan powerstore::create_assign_protection_policy(
   # set it to empty string if the plan is ran with 'ensure=absent'
   #
   apply($targets,  '_catch_errors' => true) {
-    powerstore_volume { $volume_name: 
+    powerstore_volume { $volume_name:
       protection_policy_id => $ensure ? { 'present' => $policy_id, 'absent' => '' }
     }
   }

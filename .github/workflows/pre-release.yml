@@ -27,8 +27,11 @@ jobs:
         sudo apt-get update 
         sudo apt-get install pdk
 
+    - name: Validate style and syntax 
+      run: pdk validate
+
     - name: run unit tests 
       run: pdk test unit
 
-    - name: run rubocop check
-      run: pdk bundle exec rake rubocop
+    # - name: run rubocop check
+    #   run: pdk bundle exec rake rubocop

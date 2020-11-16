@@ -22,7 +22,7 @@ plan powerstore::create_volume(
   TargetSpec                $targets,
   String                    $volume_name,
   Integer                   $size         = 26843545600,
-  String                    $description  = 'Created via Puppet powerstore_volume resource', 
+  String                    $description  = 'Created via Puppet powerstore_volume resource',
   Enum['present', 'absent'] $ensure       = 'present'
 ) {
 
