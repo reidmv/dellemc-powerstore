@@ -1,6 +1,9 @@
 name: Verify pre-release status
 
 on:
+  push:
+    branches: 
+    - main
   pull_request:
     branches: 
     - main
