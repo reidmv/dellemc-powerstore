@@ -24,7 +24,7 @@
     - [Setting up the prism mock API server](#setting-up-the-prism-mock-api-server)
     - [Running type/provider acceptance tests](#running-typeprovider-acceptance-tests)
     - [Running task acceptance tests](#running-task-acceptance-tests)
-    - [Renerating REFERENCE.md](#renerating-referencemd)
+    - [Generating REFERENCE.md](#generating-referencemd)
   - [Contributors](#contributors)
   - [Contact](#contact)
   - [Release Notes](#release-notes)
@@ -35,7 +35,7 @@ The `dellemc-powerstore` module manages resources on a Dell EMC PowerStore Stora
 
 Dell EMC PowerStore is a next-generation midrange data storage solution targeted at customers who are looking for value, flexibility, and simplicity. PowerStore provides our customers with data-centric, intelligent, and adaptable infrastructure that supports both traditional and modern workloads.
 
-The `dellemc-powerstore` Puppet module allows you to configure and deploy the PowerStore appliance using Puppet Bolt. To that end it offers types and providers, tasks and plans.
+The `dellemc-powerstore` Puppet module allows you to configure and deploy the PowerStore appliance using Puppet Bolt. To that end it offers resource types, tasks and plans.
 
 ## License
 
@@ -72,6 +72,7 @@ The `dellemc-powerstore` Puppet module allows you to configure and deploy the Po
     version: 2
     targets:
     - name: my_array
+      uri: my.powerstore.host
       config:
         transport: remote
         remote:
@@ -121,13 +122,15 @@ PARAMETERS:
     Logical unit number for the host volume access.
 ```
 
-The --targets parameter is the name of the device as configured in the inventory file (see above).
+The `--targets` parameter (abbreviated by `-t`) is the name of the device as configured in the inventory file (see above).
 
 Every parameter is displayed along with its data type. Optional parameters have a type starting with the word `Optional`. So in the above example, the task accepts 3 parameters:
 - `host_group_id`: optional String parameter
 - `host_id`: optional String parameter
 - `id`: required String parameter
 - `logical_unit_number`: optional parameter, should be an Integer between 0 and 16383.
+
+Tasks live in the `tasks/` folder of the module repository.
 
 #### Examples
 
@@ -151,9 +154,9 @@ Every parameter is displayed along with its data type. Optional parameters have 
 
 ### Using Plans
 
-Plans are higher-level workflows which can leverage logic, tasks and commands to perform orchestrated operations on managed devices. Puppet Plans can be written using YAML or Puppet language (see documentation on [writing Plans](https://puppet.com/docs/bolt/latest/plans.html)). Example `PowerStore` plans can be found in the [plans](plans) directory and are documented [here](REFERENCE.md#plans).
+Plans are higher-level workflows that can leverage logic, tasks and commands to perform orchestrated operations on managed devices. Plans can be written using YAML or Puppet language (see documentation on [writing Plans](https://puppet.com/docs/bolt/latest/plans.html)). Example `PowerStore` plans can be found in the [plans](plans) directory of this repository and are documented [here](REFERENCE.md#plans).
 
-For displaying usage information for a plan, run `bolt plan show`. for example:
+For displaying usage information for a plan, run `bolt plan show`, for example:
 ```
 > bolt plan show powerstore::capacity_volumes
 
@@ -171,7 +174,7 @@ PARAMETERS:
 Example of running the plan:
 
 ```
-> bolt plan run powerstore::capacity_volumes -t pws3k threshold=220G
+> bolt plan run powerstore::capacity_volumes -t my_array threshold=220G
 Starting: plan powerstore::capacity_volumes
 Starting: task powerstore::volume_collection_query on my_array
 Finished: task powerstore::volume_collection_query with 0 failures in 1.64 sec
@@ -190,7 +193,7 @@ Plan completed successfully with no result
 
 ### Using Idempotent Puppet Resource Types
 
-Tasks are an imperative way to query or manipulate state. In addition, the `powerstore` module offers Puppet types which offer an idempotent way of managing the devices's desired state.
+Tasks are an imperative way to query or manipulate state. In addition, the `dellemc-powerstore` module offers Puppet resource types which offer an idempotent way of managing the devices's desired state.
 
 Example of managing a volume called `my_volume` and ensuring it is created if it does not exist:
 
@@ -229,7 +232,7 @@ Direct links to the various parts of the reference documentation:
 
 ## Limitations
 
-... forthcoming ...
+The module has been tested on CentOS 7 only but should work on any platform Bolt supports.
 
 ## Development
 
@@ -384,7 +387,7 @@ To run a subset of task tests, for example volume-related, do:
 > MOCK_ACCEPTANCE=true pdk bundle exec rspec spec/task -e volume
 ```
 
-### Renerating REFERENCE.md
+### Generating REFERENCE.md
 
 To (re-)generate the REFERENCE.md file which documents the available types, tasks, functions and plans, run:
 
